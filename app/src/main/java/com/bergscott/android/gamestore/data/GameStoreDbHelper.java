@@ -37,7 +37,7 @@ public class GameStoreDbHelper extends SQLiteOpenHelper {
                 + ProductEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + ProductEntry.COLUMN_PRODUCT_NAME + " TEXT NOT NULL, "
                 + ProductEntry.COLUMN_PRODUCT_PRICE + " INTEGER NOT NULL, "
-                + ProductEntry.COLUMN_PRODUCT_QUANTITY + " INTEGER NOT NULL DEFAULT 0), "
+                + ProductEntry.COLUMN_PRODUCT_QUANTITY + " INTEGER NOT NULL DEFAULT 0, "
                 + ProductEntry.COLUMN_PRODUCT_SUPPLIER + " INTEGER, "
                 + "FOREIGN KEY(" + ProductEntry.COLUMN_PRODUCT_SUPPLIER + ") REFERENCES " +
                         SupplierEntry.TABLE_NAME + "(" + SupplierEntry._ID + "));";
