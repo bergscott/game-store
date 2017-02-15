@@ -15,6 +15,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <provider
+            android:authorities="com.bergscott.android.gamestore"
+            android:name=".data.GameStoreProvider"
+            android:exported="false" />
     </application>
 
 </manifest>
