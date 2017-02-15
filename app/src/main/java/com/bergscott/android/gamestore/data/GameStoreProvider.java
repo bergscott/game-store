@@ -1,9 +1,11 @@
 package com.bergscott.android.gamestore.data;
 
 import android.content.ContentProvider;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.Nullable;
 
@@ -55,8 +57,56 @@ public class GameStoreProvider extends ContentProvider {
 
     @Nullable
     @Override
-    public Cursor query(Uri uri, String[] strings, String s, String[] strings1, String s1) {
-        return null;
+    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
+                        String sortOrder) {
+        // get readable database
+        SQLiteDatabase database = mDbHelper.getReadableDatabase();
+
+        // This cursor will hold the result of the query
+        Cursor cursor;
+
+        // Match the uri to a specific code
+        int match = sUriMatcher.match(uri);
+        switch (match) {
+            case PRODUCTS:
+                // For the PRODUCTS code, query the products table directly with the given
+                // projection, selection, selection arguments, and sort order. The cursor
+                // could contain multiple rows of the products table.
+                cursor = database.query(GameStoreContract.ProductEntry.TABLE_NAME, projection,
+                        selection, selectionArgs, null, null, sortOrder);
+                break;
+            case PRODUCT_ID:
+                // For the PRODUCT_ID code, extract out the ID from the URI and query the products
+                // table for the entry with that ID
+                selection = GameStoreContract.ProductEntry._ID + "=?";
+                selectionArgs = new String[] {String.valueOf(ContentUris.parseId(uri)) };
+
+                // This will perform a query on the products table for the row where the _id matches
+                // the id extracted from the uri
+                cursor = database.query(GameStoreContract.ProductEntry.TABLE_NAME, projection,
+                        selection, selectionArgs, null, null, sortOrder);
+                break;
+            case SUPPLIERS:
+                // For the SUPPLIERS code, query the suppliers table directly
+                cursor = database.query(GameStoreContract.SupplierEntry.TABLE_NAME, projection,
+                        selection, selectionArgs, null ,null, sortOrder);
+                break;
+            case SUPPLIER_ID:
+                // For the SUPPLIER_ID code, extract out the ID from the URI and query the suppliers
+                // table for the entry with that ID
+                selection = GameStoreContract.SupplierEntry._ID + "=?";
+                selectionArgs = new String[] {String.valueOf(ContentUris.parseId(uri)) };
+
+                // This will perform a query on the suppliers table for the row where the _id matches
+                // the id extracted from the uri
+                cursor = database.query(GameStoreContract.SupplierEntry.TABLE_NAME, projection,
+                        selection, selectionArgs, null ,null, sortOrder);
+                break;
+            default:
+                throw new IllegalArgumentException("Cannot query unknown URI " + uri);
+        }
+        cursor.setNotificationUri(getContext().getContentResolver(), uri);
+        return cursor;
     }
 
     @Nullable
