@@ -8,12 +8,18 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.Nullable;
+import android.util.Log;
+
+import static android.R.attr.data;
 
 /**
  * Created by bergs on 2/15/2017.
  */
 
 public class GameStoreProvider extends ContentProvider {
+
+    /** Tag for log messages */
+    public static final String LOG_TAG = GameStoreProvider.class.getSimpleName();
 
     /** Database Helper for Pet SQL Database */
     private GameStoreDbHelper mDbHelper;
@@ -111,14 +117,55 @@ public class GameStoreProvider extends ContentProvider {
 
     @Nullable
     @Override
-    public String getType(Uri uri) {
-        return null;
+    public Uri insert(Uri uri, ContentValues contentValues) {
+        final int match = sUriMatcher.match(uri);
+        switch (match) {
+            case PRODUCTS:
+                return insertProduct(uri, contentValues);
+            case SUPPLIERS:
+                return insertSupplier(uri, contentValues);
+            default:
+                throw new IllegalArgumentException("Insertion is not supported for " + uri);
+        }
     }
 
-    @Nullable
-    @Override
-    public Uri insert(Uri uri, ContentValues contentValues) {
-        return null;
+    private Uri insertProduct(Uri uri, ContentValues values) {
+        // TODO: Sanity checks
+
+        return insertValuesToTable(uri, values, GameStoreContract.ProductEntry.TABLE_NAME);
+    }
+
+    private Uri insertSupplier(Uri uri, ContentValues values) {
+        // TODO: Sanity checks
+
+        return insertValuesToTable(uri, values, GameStoreContract.SupplierEntry.TABLE_NAME);
+    }
+
+    /**
+     * Inserts the given content values into the table with the given name. Returns the Uri
+     * of the new entry
+     * @param uri address of the table
+     * @param values valuse of new entry to be inserted into table
+     * @param tableName name of the table in the database
+     * @return the uri of the new  table entry
+     */
+    private Uri insertValuesToTable(Uri uri, ContentValues values, String tableName) {
+        // get writable database
+        SQLiteDatabase database = mDbHelper.getWritableDatabase();
+
+        // insert the new supplier with the given values into the suppliers table
+        long id = database.insert(tableName, null, values);
+
+        // If the ID is -1, then the insertion failed. Log an error and return null.
+        if (id == -1) {
+            Log.e(LOG_TAG, "Failed to insert row for " + uri);
+            return null;
+        }
+
+        // Notify the content resolver of the change
+        getContext().getContentResolver().notifyChange(uri, null);
+        // Return the new URI with the ID of the newly inserted row appended at the end
+        return ContentUris.withAppendedId(uri, id);
     }
 
     @Override
@@ -129,5 +176,11 @@ public class GameStoreProvider extends ContentProvider {
     @Override
     public int update(Uri uri, ContentValues contentValues, String s, String[] strings) {
         return 0;
+    }
+
+    @Nullable
+    @Override
+    public String getType(Uri uri) {
+        return null;
     }
 }
