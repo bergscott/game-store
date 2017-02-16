@@ -1,17 +1,27 @@
 package com.bergscott.android.gamestore;
 
 import android.content.ContentValues;
+import android.database.Cursor;
+import android.database.MatrixCursor;
+import android.database.MergeCursor;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.SimpleCursorAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.math.BigDecimal;
+
+import com.bergscott.android.gamestore.data.GameStoreContract;
 import com.bergscott.android.gamestore.data.GameStoreContract.ProductEntry;
 
 public class EditProductActivity extends AppCompatActivity {
@@ -25,15 +35,71 @@ public class EditProductActivity extends AppCompatActivity {
     /** EditText for product quantity */
     private EditText mQuantityEditText;
 
+    /** Spinner for selecting product's supplier */
+    private Spinner mSupplierSpinner;
+
+    /** Constant indicating no supplier */
+    private final long NO_SUPPLIER = -1;
+
+    /** id of product's supplier */
+    private long mSupplier = NO_SUPPLIER;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_product);
 
-        // find the edit text views and assign them to variables
+        // find the relevant text views and assign them to variables
         mNameEditText = (EditText) findViewById(R.id.edit_text_product_name);
         mPriceEditText = (EditText) findViewById(R.id.edit_text_product_price);
         mQuantityEditText = (EditText) findViewById(R.id.edit_text_product_quantity);
+        mSupplierSpinner = (Spinner) findViewById(R.id.spinner_supplier);
+
+        // setup the spinner
+        setupSpinner();
+    }
+
+    /**
+     * Setup the dropdown spinner that allows the user to select the product's supplier.
+     */
+    private void setupSpinner() {
+
+        String[] projection = { GameStoreContract.SupplierEntry._ID,
+                GameStoreContract.SupplierEntry.COLUMN_SUPPLIER_NAME };
+
+        // setup the cursor from the database and add a no supplier line
+        Cursor dbCursor = getContentResolver().query(GameStoreContract.SupplierEntry.CONTENT_URI,
+                projection, null, null, null);
+        MatrixCursor extras = new MatrixCursor(new String[] {
+                GameStoreContract.SupplierEntry._ID,
+                GameStoreContract.SupplierEntry.COLUMN_SUPPLIER_NAME
+        });
+        extras.addRow(new String[] { Long.toString(NO_SUPPLIER), "No Supplier" });
+        Cursor[] cursors = { extras, dbCursor };
+        Cursor fullSpinnerCursor = new MergeCursor(cursors);
+
+        // initialize a simple cursor adapter to attach to the spinner
+        String[] from = { GameStoreContract.SupplierEntry.COLUMN_SUPPLIER_NAME };
+        int[] to = { android.R.id.text1 };
+        SimpleCursorAdapter supplierAdapter = new SimpleCursorAdapter(this,
+                android.R.layout.simple_spinner_item, fullSpinnerCursor, from, to, 0);
+
+        supplierAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
+
+        // set the adapter to the spinner
+        mSupplierSpinner.setAdapter(supplierAdapter);
+
+        mSupplierSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+                mSupplier = id;
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                mSupplier = NO_SUPPLIER;
+            }
+        });
     }
 
     @Override
@@ -75,10 +141,16 @@ public class EditProductActivity extends AppCompatActivity {
             quantity = Integer.parseInt(quantityString);
         }
 
+
+
         ContentValues values = new ContentValues();
         values.put(ProductEntry.COLUMN_PRODUCT_NAME, nameString);
         values.put(ProductEntry.COLUMN_PRODUCT_PRICE, price);
         values.put(ProductEntry.COLUMN_PRODUCT_QUANTITY, quantity);
+        // Only include a supplier if a supplier was selected
+        if (mSupplier != NO_SUPPLIER) {
+            values.put(ProductEntry.COLUMN_PRODUCT_SUPPLIER, mSupplier);
+        }
 
         Uri resultUri = getContentResolver().insert(ProductEntry.CONTENT_URI, values);
 
