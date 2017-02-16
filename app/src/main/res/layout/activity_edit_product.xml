@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_edit_supplier"
+    android:id="@+id/activity_edit_product"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingBottom="@dimen/activity_vertical_margin"
@@ -9,8 +9,8 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:orientation="vertical"
-    tools:context="com.bergscott.android.gamestore.EditSupplierActivity">
-    
+    tools:context="com.bergscott.android.gamestore.EditProductActivity">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -20,15 +20,15 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            tools:text="Name"
+            android:text="Name"
             android:textSize="14sp"/>
 
         <EditText
-            android:id="@+id/edit_text_supplier_name"
+            android:id="@+id/edit_text_product_name"
             android:layout_width="0dp"
             android:layout_weight="2"
             android:layout_height="wrap_content"
-            android:hint="Supplier Name"/>
+            android:hint="Product Name"/>
     </LinearLayout>
 
     <LinearLayout
@@ -41,7 +41,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:paddingTop="12dp"
-            tools:text="Contact Info" />
+            android:text="Info" />
 
         <LinearLayout
             android:layout_width="0dp"
@@ -49,19 +49,32 @@
             android:layout_weight="2"
             android:orientation="vertical">
 
-            <EditText
-                android:id="@+id/edit_text_supplier_phone"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="phone"
-                android:hint="Phone"/>
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/edit_text_product_price"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal"
+                    android:hint="Price"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:text="USD"/>
+            </LinearLayout>
 
             <EditText
-                android:id="@+id/edit_text_supplier_web"
+                android:id="@+id/edit_text_product_quantity"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textUri"
-                android:hint="Website"/>
+                android:inputType="number"
+                android:hint="Quantity"/>
         </LinearLayout>
     </LinearLayout>
 

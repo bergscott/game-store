@@ -2,11 +2,14 @@ package com.bergscott.android.gamestore;
 
 import android.app.LoaderManager;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.ListView;
 
 import com.bergscott.android.gamestore.data.GameStoreContract;
@@ -70,5 +73,26 @@ public class CatalogActivity extends AppCompatActivity
         // adapter's data needs to be cleared, so wap in null and drop all reference to the previous
         // cursor to prevent memory leaks
         mProductCursorAdapter.swapCursor(null);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_catalog, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_add_prodcut:
+                Intent intentProduct = new Intent(CatalogActivity.this, EditProductActivity.class);
+                startActivity(intentProduct);
+                return true;
+            case R.id.action_add_supplier:
+                Intent intentSupplier = new Intent(CatalogActivity.this, EditSupplierActivity.class);
+                startActivity(intentSupplier);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
