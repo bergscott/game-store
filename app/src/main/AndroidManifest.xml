@@ -15,10 +15,19 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".EditSupplierActivity"
+            android:parentActivityName=".CatalogActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".CatalogActivity"/>
+        </activity>
+
         <provider
-            android:authorities="com.bergscott.android.gamestore"
             android:name=".data.GameStoreProvider"
+            android:authorities="com.bergscott.android.gamestore"
             android:exported="false" />
+
     </application>
 
 </manifest>
