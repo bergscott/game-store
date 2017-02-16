@@ -53,12 +53,14 @@
                 android:id="@+id/edit_text_supplier_phone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:inputType="phone"
                 android:hint="Phone"/>
 
             <EditText
                 android:id="@+id/edit_text_supplier_web"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:inputType="textUri"
                 android:hint="Website"/>
         </LinearLayout>
     </LinearLayout>
