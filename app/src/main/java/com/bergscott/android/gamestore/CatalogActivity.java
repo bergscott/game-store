@@ -1,6 +1,7 @@
 package com.bergscott.android.gamestore;
 
 import android.app.LoaderManager;
+import android.content.ContentUris;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
@@ -10,6 +11,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.bergscott.android.gamestore.data.GameStoreContract;
@@ -40,6 +43,17 @@ public class CatalogActivity extends AppCompatActivity
         // setup the cursor adapter and set it to the list view
         mProductCursorAdapter = new ProductCursorAdapter(this, null);
         mProductsListView.setAdapter(mProductCursorAdapter);
+
+        // set an on item click listener to launch the product detail activity when a list item is
+        // selected
+        mProductsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                Intent intent = new Intent(CatalogActivity.this, ProductDetailActivity.class);
+                intent.setData(ContentUris.withAppendedId(ProductEntry.CONTENT_URI, id));
+                startActivity(intent);
+            }
+        });
 
         // initialize the cursor loader for product data
         getLoaderManager().initLoader(PRODUCT_LOADER, null, this);

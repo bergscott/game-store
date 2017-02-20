@@ -30,12 +30,20 @@
                 android:value=".CatalogActivity" />
         </activity>
 
+        <activity android:name=".ProductDetailActivity"
+            android:parentActivityName=".CatalogActivity"
+            android:label="Product Detail">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".CatalogActivity" />
+        </activity>
+
         <provider
             android:name=".data.GameStoreProvider"
             android:authorities="com.bergscott.android.gamestore"
             android:exported="false" />
 
-        <activity android:name=".ProductDetailActivity"></activity>
+
     </application>
 
 </manifest>
