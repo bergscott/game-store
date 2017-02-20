@@ -141,8 +141,6 @@ public class EditProductActivity extends AppCompatActivity {
             quantity = Integer.parseInt(quantityString);
         }
 
-
-
         ContentValues values = new ContentValues();
         values.put(ProductEntry.COLUMN_PRODUCT_NAME, nameString);
         values.put(ProductEntry.COLUMN_PRODUCT_PRICE, price);

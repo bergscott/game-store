@@ -22,7 +22,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".CatalogActivity" />
         </activity>
-
         <activity
             android:name=".EditProductActivity"
             android:parentActivityName=".CatalogActivity">
@@ -36,6 +35,7 @@
             android:authorities="com.bergscott.android.gamestore"
             android:exported="false" />
 
+        <activity android:name=".ProductDetailActivity"></activity>
     </application>
 
 </manifest>
