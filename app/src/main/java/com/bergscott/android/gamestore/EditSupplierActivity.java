@@ -65,8 +65,12 @@ public class EditSupplierActivity extends AppCompatActivity {
 
         ContentValues values = new ContentValues();
         values.put(SupplierEntry.COLUMN_SUPPLIER_NAME, nameString);
-        values.put(SupplierEntry.COLUMN_SUPPLIER_PHONE, phoneString);
-        values.put(SupplierEntry.COLUMN_SUPPLIER_WEB, webString);
+        if (!TextUtils.isEmpty(phoneString)) {
+            values.put(SupplierEntry.COLUMN_SUPPLIER_PHONE, phoneString);
+        }
+        if (!TextUtils.isEmpty(webString)) {
+            values.put(SupplierEntry.COLUMN_SUPPLIER_WEB, webString);
+        }
 
         // insert the supplier into the database
         Uri resultUri = getContentResolver().insert(SupplierEntry.CONTENT_URI, values);

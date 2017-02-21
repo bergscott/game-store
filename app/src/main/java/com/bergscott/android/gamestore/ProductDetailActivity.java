@@ -61,6 +61,7 @@ public class ProductDetailActivity extends AppCompatActivity
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
 
         if (cursor.moveToFirst()) {
+            // set the Text of the layout TextViews with the appropriate values in the cursor
             mNameTextView.setText(cursor.getString(cursor.getColumnIndex(
                     GameStoreContract.ProductWithSupplierEntry.COLUMN_PRODUCT_NAME)));
             int priceInCents = cursor.getInt(cursor.getColumnIndex(
@@ -73,31 +74,55 @@ public class ProductDetailActivity extends AppCompatActivity
             mSupplierNameTextView.setText(cursor.getString(cursor.getColumnIndex(
                     GameStoreContract.ProductWithSupplierEntry.COLUMN_SUPPLIER_NAME)));
 
-            final Uri phoneUri = Uri.parse("tel:" + cursor.getString(cursor.getColumnIndex(
-                    GameStoreContract.ProductWithSupplierEntry.COLUMN_SUPPLIER_PHONE)));
+            // setup the button to launch the phone dialer with the supplier's number
+            int phoneColumnIndex = cursor.getColumnIndex(
+                    GameStoreContract.ProductWithSupplierEntry.COLUMN_SUPPLIER_PHONE);
 
-            mPhoneButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Intent phoneIntent = new Intent(Intent.ACTION_VIEW, phoneUri);
-                    if (phoneIntent.resolveActivity(getPackageManager()) != null) {
-                        startActivity(phoneIntent);
+            // if phone number is Null, hide the button
+            if (cursor.isNull(phoneColumnIndex)) {
+                mPhoneButton.setVisibility(View.GONE);
+            } else {
+                // phone number is not null, make button visible and set its OnClickListener
+                mPhoneButton.setVisibility(View.VISIBLE);
+
+                final Uri phoneUri = Uri.parse("tel:" + cursor.getString(cursor.getColumnIndex(
+                        GameStoreContract.ProductWithSupplierEntry.COLUMN_SUPPLIER_PHONE)));
+
+                mPhoneButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent phoneIntent = new Intent(Intent.ACTION_VIEW, phoneUri);
+                        if (phoneIntent.resolveActivity(getPackageManager()) != null) {
+                            startActivity(phoneIntent);
+                        }
                     }
-                }
-            });
+                });
+            }
 
-            final Uri webUri = Uri.parse(cursor.getString(cursor.getColumnIndex(
-                    GameStoreContract.ProductWithSupplierEntry.COLUMN_SUPPLIER_WEB)));
+            // setup the button to launch the web browser with the supplier's url
+            int webColumnIndex = cursor.getColumnIndex(
+                    GameStoreContract.ProductWithSupplierEntry.COLUMN_SUPPLIER_WEB);
 
-            mWebButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Intent webIntent = new Intent(Intent.ACTION_VIEW, webUri);
-                    if (webIntent.resolveActivity(getPackageManager()) != null) {
-                        startActivity(webIntent);
+            // if website is null, hide the button
+            if (cursor.isNull(webColumnIndex)) {
+                mWebButton.setVisibility(View.GONE);
+            } else {
+                // website is not null, so make button visible and set its OnClickListener
+                mWebButton.setVisibility(View.VISIBLE);
+
+                final Uri webUri = Uri.parse(cursor.getString(cursor.getColumnIndex(
+                        GameStoreContract.ProductWithSupplierEntry.COLUMN_SUPPLIER_WEB)));
+
+                mWebButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent webIntent = new Intent(Intent.ACTION_VIEW, webUri);
+                        if (webIntent.resolveActivity(getPackageManager()) != null) {
+                            startActivity(webIntent);
+                        }
                     }
-                }
-            });
+                });
+            }
 
         } else {
             Log.w("ProductDetailActivity", "Loader returned empty cursor");
