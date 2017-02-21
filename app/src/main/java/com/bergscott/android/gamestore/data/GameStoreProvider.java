@@ -125,6 +125,10 @@ public class GameStoreProvider extends ContentProvider {
                         + GameStoreContract.SupplierEntry.TABLE_NAME + "." + GameStoreContract.SupplierEntry._ID
                         + " WHERE " + GameStoreContract.ProductEntry.TABLE_NAME + "." + GameStoreContract.ProductEntry._ID
                         + "=?", selectionArgs);
+
+                // set the uri to this entry in the products table for notification purposes
+                uri = ContentUris.withAppendedId(GameStoreContract.ProductEntry.CONTENT_URI,
+                        ContentUris.parseId(uri));
                 break;
             default:
                 throw new IllegalArgumentException("Cannot query unknown URI " + uri);
