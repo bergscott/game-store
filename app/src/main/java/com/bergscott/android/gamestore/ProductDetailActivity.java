@@ -1,6 +1,8 @@
 package com.bergscott.android.gamestore;
 
 import android.app.LoaderManager;
+import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
@@ -12,6 +14,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bergscott.android.gamestore.data.GameStoreContract;
 
@@ -29,8 +32,12 @@ public class ProductDetailActivity extends AppCompatActivity
     TextView mSupplierNameTextView;
     Button mPhoneButton;
     Button mWebButton;
+    Button mShipmentButton;
+    Button mSaleButton;
 
     Uri mProductUri;
+
+    int mQuantity = 0;
 
     private final int PRODUCT_LOADER = 0;
 
@@ -47,8 +54,31 @@ public class ProductDetailActivity extends AppCompatActivity
         mSupplierNameTextView = (TextView) findViewById(R.id.detail_supplier_name);
         mPhoneButton = (Button) findViewById(R.id.supplier_phone_button);
         mWebButton = (Button) findViewById(R.id.supplier_web_button);
+        mShipmentButton = (Button) findViewById(R.id.detail_shipment_button);
+        mSaleButton = (Button) findViewById(R.id.detail_sale_button);
 
         getLoaderManager().initLoader(PRODUCT_LOADER, null, this);
+
+        mShipmentButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ContentValues values = new ContentValues();
+                values.put(GameStoreContract.ProductEntry.COLUMN_PRODUCT_QUANTITY, mQuantity + 1);
+
+                Uri uri = ContentUris.withAppendedId(GameStoreContract.ProductEntry.CONTENT_URI,
+                        ContentUris.parseId(mProductUri));
+
+                int rowsModified = getContentResolver().update(uri, values, null, null);
+
+                if (rowsModified == 0) {
+                    Toast.makeText(ProductDetailActivity.this, "Error with updating quantity",
+                            Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(ProductDetailActivity.this, "Quantity updated!",
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
 
     }
 
@@ -68,9 +98,9 @@ public class ProductDetailActivity extends AppCompatActivity
                     GameStoreContract.ProductWithSupplierEntry.COLUMN_PRODUCT_PRICE));
             mPriceTextView.setText(getString(R.string.list_item_price,
                     ProductUtils.getDecimalPrice(priceInCents)));
-            int quantity = cursor.getInt(cursor.getColumnIndex(
+            mQuantity = cursor.getInt(cursor.getColumnIndex(
                     GameStoreContract.ProductWithSupplierEntry.COLUMN_PRODUCT_QUANTITY));
-            mQuantityTextView.setText(getString(R.string.list_item_quantity, quantity));
+            mQuantityTextView.setText(getString(R.string.list_item_quantity, mQuantity));
             mSupplierNameTextView.setText(cursor.getString(cursor.getColumnIndex(
                     GameStoreContract.ProductWithSupplierEntry.COLUMN_SUPPLIER_NAME)));
 
