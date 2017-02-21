@@ -12,6 +12,10 @@ import android.util.Log;
 
 import static android.R.attr.data;
 
+import com.bergscott.android.gamestore.data.GameStoreContract.ProductEntry;
+import com.bergscott.android.gamestore.data.GameStoreContract.SupplierEntry;
+import com.bergscott.android.gamestore.data.GameStoreContract.ProductWithSupplierEntry;
+
 /**
  * Created by bergs on 2/15/2017.
  */
@@ -83,34 +87,34 @@ public class GameStoreProvider extends ContentProvider {
                 // For the PRODUCTS code, query the products table directly with the given
                 // projection, selection, selection arguments, and sort order. The cursor
                 // could contain multiple rows of the products table.
-                cursor = database.query(GameStoreContract.ProductEntry.TABLE_NAME, projection,
+                cursor = database.query(ProductEntry.TABLE_NAME, projection,
                         selection, selectionArgs, null, null, sortOrder);
                 break;
             case PRODUCT_ID:
                 // For the PRODUCT_ID code, extract out the ID from the URI and query the products
                 // table for the entry with that ID
-                selection = GameStoreContract.ProductEntry._ID + "=?";
+                selection = ProductEntry._ID + "=?";
                 selectionArgs = new String[] { String.valueOf(ContentUris.parseId(uri)) };
 
                 // This will perform a query on the products table for the row where the _id matches
                 // the id extracted from the uri
-                cursor = database.query(GameStoreContract.ProductEntry.TABLE_NAME, projection,
+                cursor = database.query(ProductEntry.TABLE_NAME, projection,
                         selection, selectionArgs, null, null, sortOrder);
                 break;
             case SUPPLIERS:
                 // For the SUPPLIERS code, query the suppliers table directly
-                cursor = database.query(GameStoreContract.SupplierEntry.TABLE_NAME, projection,
+                cursor = database.query(SupplierEntry.TABLE_NAME, projection,
                         selection, selectionArgs, null ,null, sortOrder);
                 break;
             case SUPPLIER_ID:
                 // For the SUPPLIER_ID code, extract out the ID from the URI and query the suppliers
                 // table for the entry with that ID
-                selection = GameStoreContract.SupplierEntry._ID + "=?";
+                selection = SupplierEntry._ID + "=?";
                 selectionArgs = new String[] { String.valueOf(ContentUris.parseId(uri)) };
 
                 // This will perform a query on the suppliers table for the row where the _id matches
                 // the id extracted from the uri
-                cursor = database.query(GameStoreContract.SupplierEntry.TABLE_NAME, projection,
+                cursor = database.query(SupplierEntry.TABLE_NAME, projection,
                         selection, selectionArgs, null ,null, sortOrder);
                 break;
             case PRODUCT_WITH_SUPPLIER_ID:
@@ -119,15 +123,15 @@ public class GameStoreProvider extends ContentProvider {
                 selectionArgs = new String[] { String.valueOf(ContentUris.parseId(uri)) };
 
                 cursor = database.rawQuery("SELECT * FROM "
-                        + GameStoreContract.ProductEntry.TABLE_NAME + " INNER JOIN "
-                        + GameStoreContract.SupplierEntry.TABLE_NAME + " ON "
-                        + GameStoreContract.ProductEntry.TABLE_NAME + "." + GameStoreContract.ProductEntry.COLUMN_PRODUCT_SUPPLIER + "="
-                        + GameStoreContract.SupplierEntry.TABLE_NAME + "." + GameStoreContract.SupplierEntry._ID
-                        + " WHERE " + GameStoreContract.ProductEntry.TABLE_NAME + "." + GameStoreContract.ProductEntry._ID
+                        + ProductEntry.TABLE_NAME + " INNER JOIN "
+                        + SupplierEntry.TABLE_NAME + " ON "
+                        + ProductEntry.TABLE_NAME + "." + ProductEntry.COLUMN_PRODUCT_SUPPLIER + "="
+                        + SupplierEntry.TABLE_NAME + "." + SupplierEntry._ID
+                        + " WHERE " + ProductEntry.TABLE_NAME + "." + ProductEntry._ID
                         + "=?", selectionArgs);
 
                 // set the uri to this entry in the products table for notification purposes
-                uri = ContentUris.withAppendedId(GameStoreContract.ProductEntry.CONTENT_URI,
+                uri = ContentUris.withAppendedId(ProductEntry.CONTENT_URI,
                         ContentUris.parseId(uri));
                 break;
             default:
@@ -154,13 +158,13 @@ public class GameStoreProvider extends ContentProvider {
     private Uri insertProduct(Uri uri, ContentValues values) {
         // TODO: Sanity checks
 
-        return insertValuesToTable(uri, values, GameStoreContract.ProductEntry.TABLE_NAME);
+        return insertValuesToTable(uri, values, ProductEntry.TABLE_NAME);
     }
 
     private Uri insertSupplier(Uri uri, ContentValues values) {
         // TODO: Sanity checks
 
-        return insertValuesToTable(uri, values, GameStoreContract.SupplierEntry.TABLE_NAME);
+        return insertValuesToTable(uri, values, SupplierEntry.TABLE_NAME);
     }
 
     /**
@@ -196,8 +200,88 @@ public class GameStoreProvider extends ContentProvider {
     }
 
     @Override
-    public int update(Uri uri, ContentValues contentValues, String s, String[] strings) {
-        return 0;
+    public int update(Uri uri, ContentValues contentValues, 
+                      String selection, String[] selectionArgs) {
+        final int match = sUriMatcher.match(uri);
+        switch (match) {
+            case PRODUCTS:
+                return updateProduct(uri, contentValues, selection, selectionArgs);
+            case PRODUCT_ID:
+                selection = ProductEntry._ID + "=?";
+                selectionArgs = new String[] { String.valueOf(ContentUris.parseId(uri)) };
+                return updateProduct(uri, contentValues, selection, selectionArgs);
+            case SUPPLIERS:
+                return updateSupplier(uri, contentValues, selection, selectionArgs);
+            case SUPPLIER_ID:
+                selection = SupplierEntry._ID + "=?";
+                selectionArgs = new String[] { String.valueOf(ContentUris.parseId(uri)) };
+                return updateSupplier(uri, contentValues, selection, selectionArgs);
+            default:
+                throw new IllegalArgumentException("Update is not supported for " + uri);
+        }
+    }
+    
+    private int updateProduct(Uri uri, ContentValues values, String selection, 
+                              String[] selectionArgs) {
+        // if the product name column is present check that the name is not null
+        if (values.containsKey(ProductEntry.COLUMN_PRODUCT_NAME)) {
+            String name = values.getAsString(ProductEntry.COLUMN_PRODUCT_NAME);
+            if (name == null) {
+                throw new IllegalArgumentException("Product requires a name");
+            }
+        }
+
+        // if the product quantity column is present, check that it is valid (quantity can be null,
+        // as it has a default value of 0)
+        if (values.containsKey(ProductEntry.COLUMN_PRODUCT_QUANTITY)) {
+            Integer quantity = values.getAsInteger(ProductEntry.COLUMN_PRODUCT_QUANTITY);
+            if (quantity != null && quantity < 0) {
+                throw new IllegalArgumentException("Product requires a valid quantity");
+            }
+        }
+
+        // if the price column is present, check that it is not null and is valid
+        if (values.containsKey(ProductEntry.COLUMN_PRODUCT_PRICE)) {
+            Integer price = values.getAsInteger(ProductEntry.COLUMN_PRODUCT_PRICE);
+            if (price == null || price < 0) {
+                throw new IllegalArgumentException("Product requires a valid price");
+            }
+        }
+
+        // should we validate a supplier ID (FOREIGN KEY)??? (must be null or match a supplier's ID)
+
+        // update the selected products in the products table
+        return updateTable(ProductEntry.TABLE_NAME, uri, values, selection, selectionArgs);
+    }
+    
+    private int updateSupplier(Uri uri, ContentValues values, String selection, 
+                               String[] selectionArgs) {
+        //TODO: Sanity checks
+        return updateTable(SupplierEntry.TABLE_NAME, uri, values, selection, selectionArgs);
+    }
+
+    private int updateTable(String tableName, Uri uri, ContentValues values,
+                            String selection, String[] selectionArgs) {
+
+        // if there are no values to update, then don't try to update the database
+        if (values.size() == 0) {
+            return 0;
+        }
+
+        // Get the writable database
+        SQLiteDatabase database = mDbHelper.getWritableDatabase();
+
+        // Update the selected entries in the table with the given values,
+        // storing the number of rows that were updated
+        int rowsUpdated = database.update(tableName, values, selection, selectionArgs);
+
+        // if any rows were updated, notify the content resolver of the change
+        if (rowsUpdated > 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+
+        // return the number of rows that were updated
+        return rowsUpdated;
     }
 
     @Nullable
