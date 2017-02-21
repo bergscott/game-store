@@ -19,6 +19,8 @@ public final class GameStoreContract {
     public static final String PATH_PRODUCTS = "products";
     public static final String PATH_SUPPLIERS = "suppliers";
 
+    public static final String PATH_PRODUCTS_WITH_SUPPLIER = "productsWithSupplier";
+
     public static final class ProductEntry implements BaseColumns {
 
         public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_PRODUCTS);
@@ -38,7 +40,7 @@ public final class GameStoreContract {
         public static final String TABLE_NAME = "products";
 
         public static final String _ID = BaseColumns._ID;
-        public static final String COLUMN_PRODUCT_NAME = "name";
+        public static final String COLUMN_PRODUCT_NAME = "product_name";
         public static final String COLUMN_PRODUCT_QUANTITY = "quantity";
         public static final String COLUMN_PRODUCT_PRICE = "price";
         public static final String COLUMN_PRODUCT_SUPPLIER = "supplier_id";
@@ -64,9 +66,38 @@ public final class GameStoreContract {
         public static final String TABLE_NAME = "suppliers";
 
         public static final String _ID = BaseColumns._ID;
-        public static final String COLUMN_SUPPLIER_NAME = "name";
-        public static final String COLUMN_SUPPLIER_PHONE = "phone";
-        public static final String COLUMN_SUPPLIER_WEB = "web";
+        public static final String COLUMN_SUPPLIER_NAME = "supplier_name";
+        public static final String COLUMN_SUPPLIER_PHONE = "supplier_phone";
+        public static final String COLUMN_SUPPLIER_WEB = "supplier_web";
 
+    }
+
+    public static final class ProductWithSupplierEntry implements BaseColumns {
+
+        public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI,
+                PATH_PRODUCTS_WITH_SUPPLIER);
+
+        /**
+         * The MIME type of the {@link #CONTENT_URI} for a list of suppliers
+         */
+        public static final String CONTENT_LIST_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/"
+                        + PATH_PRODUCTS_WITH_SUPPLIER;
+
+        /**
+         * The MIME type of the {@link #CONTENT_URI} for a single supplier
+         */
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/"
+                        + PATH_PRODUCTS_WITH_SUPPLIER;
+
+        public static final String _ID = BaseColumns._ID;
+        public static final String COLUMN_PRODUCT_NAME = "product_name";
+        public static final String COLUMN_PRODUCT_QUANTITY = "quantity";
+        public static final String COLUMN_PRODUCT_PRICE = "price";
+        public static final String COLUMN_PRODUCT_SUPPLIER = "supplier_id";
+        public static final String COLUMN_SUPPLIER_NAME = "supplier_name";
+        public static final String COLUMN_SUPPLIER_PHONE = "supplier_phone";
+        public static final String COLUMN_SUPPLIER_WEB = "supplier_web";
     }
 }

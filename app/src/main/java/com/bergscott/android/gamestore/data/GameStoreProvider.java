@@ -30,6 +30,9 @@ public class GameStoreProvider extends ContentProvider {
     /** Uri match code for querying a single entry in the PRODUCTS table */
     private static final int PRODUCT_ID = 101;
 
+    /** Uri match code for querying a single entry in the PRODUCTS table joined with its SUPPLIER */
+    private static final int PRODUCT_WITH_SUPPLIER_ID = 111;
+
     /** Uri match code for querying full SUPPLIERS table */
     private static final int SUPPLIERS = 200;
 
@@ -45,6 +48,8 @@ public class GameStoreProvider extends ContentProvider {
                 GameStoreContract.PATH_PRODUCTS, PRODUCTS);
         sUriMatcher.addURI(GameStoreContract.CONTENT_AUTHORITY,
                 GameStoreContract.PATH_PRODUCTS + "/#", PRODUCT_ID);
+        sUriMatcher.addURI(GameStoreContract.CONTENT_AUTHORITY,
+                GameStoreContract.PATH_PRODUCTS_WITH_SUPPLIER + "/#", PRODUCT_WITH_SUPPLIER_ID);
         sUriMatcher.addURI(GameStoreContract.CONTENT_AUTHORITY,
                 GameStoreContract.PATH_SUPPLIERS, SUPPLIERS);
         sUriMatcher.addURI(GameStoreContract.CONTENT_AUTHORITY,
@@ -85,7 +90,7 @@ public class GameStoreProvider extends ContentProvider {
                 // For the PRODUCT_ID code, extract out the ID from the URI and query the products
                 // table for the entry with that ID
                 selection = GameStoreContract.ProductEntry._ID + "=?";
-                selectionArgs = new String[] {String.valueOf(ContentUris.parseId(uri)) };
+                selectionArgs = new String[] { String.valueOf(ContentUris.parseId(uri)) };
 
                 // This will perform a query on the products table for the row where the _id matches
                 // the id extracted from the uri
@@ -101,12 +106,25 @@ public class GameStoreProvider extends ContentProvider {
                 // For the SUPPLIER_ID code, extract out the ID from the URI and query the suppliers
                 // table for the entry with that ID
                 selection = GameStoreContract.SupplierEntry._ID + "=?";
-                selectionArgs = new String[] {String.valueOf(ContentUris.parseId(uri)) };
+                selectionArgs = new String[] { String.valueOf(ContentUris.parseId(uri)) };
 
                 // This will perform a query on the suppliers table for the row where the _id matches
                 // the id extracted from the uri
                 cursor = database.query(GameStoreContract.SupplierEntry.TABLE_NAME, projection,
                         selection, selectionArgs, null ,null, sortOrder);
+                break;
+            case PRODUCT_WITH_SUPPLIER_ID:
+                // For the PRODUCT_WITH_SUPPLIER_ID code, extract out the ID from the URI and query
+                // a join of the product and suppliers table with that ID
+                selectionArgs = new String[] { String.valueOf(ContentUris.parseId(uri)) };
+
+                cursor = database.rawQuery("SELECT * FROM "
+                        + GameStoreContract.ProductEntry.TABLE_NAME + " INNER JOIN "
+                        + GameStoreContract.SupplierEntry.TABLE_NAME + " ON "
+                        + GameStoreContract.ProductEntry.TABLE_NAME + "." + GameStoreContract.ProductEntry.COLUMN_PRODUCT_SUPPLIER + "="
+                        + GameStoreContract.SupplierEntry.TABLE_NAME + "." + GameStoreContract.SupplierEntry._ID
+                        + " WHERE " + GameStoreContract.ProductEntry.TABLE_NAME + "." + GameStoreContract.ProductEntry._ID
+                        + "=?", selectionArgs);
                 break;
             default:
                 throw new IllegalArgumentException("Cannot query unknown URI " + uri);

@@ -50,7 +50,9 @@ public class CatalogActivity extends AppCompatActivity
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 Intent intent = new Intent(CatalogActivity.this, ProductDetailActivity.class);
-                intent.setData(ContentUris.withAppendedId(ProductEntry.CONTENT_URI, id));
+                intent.setData(ContentUris.withAppendedId(
+                        GameStoreContract.ProductWithSupplierEntry.CONTENT_URI, id
+                ));
                 startActivity(intent);
             }
         });
