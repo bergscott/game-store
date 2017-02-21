@@ -45,8 +45,7 @@ public class ProductCursorAdapter extends CursorAdapter {
         TextView priceTextView = (TextView) view.findViewById(R.id.price_text_view);
         int priceInCents = cursor.getInt(cursor.getColumnIndex(
                 GameStoreContract.ProductEntry.COLUMN_PRODUCT_PRICE));
-        BigDecimal price = new BigDecimal(priceInCents).movePointLeft(2);
-        priceTextView.setText(context.getString(R.string.list_item_price, price));
-
+        priceTextView.setText(context.getString(R.string.list_item_price,
+                ProductUtils.getDecimalPrice(priceInCents)));
     }
 }

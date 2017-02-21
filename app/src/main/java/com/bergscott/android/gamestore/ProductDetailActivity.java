@@ -55,10 +55,13 @@ public class ProductDetailActivity extends AppCompatActivity
         if (cursor.moveToFirst()) {
             mNameTextView.setText(cursor.getString(cursor.getColumnIndex(
                     GameStoreContract.ProductWithSupplierEntry.COLUMN_PRODUCT_NAME)));
-            mPriceTextView.setText(cursor.getString(cursor.getColumnIndex(
-                    GameStoreContract.ProductWithSupplierEntry.COLUMN_PRODUCT_PRICE)));
-            mQuantityTextView.setText(cursor.getString(cursor.getColumnIndex(
-                    GameStoreContract.ProductWithSupplierEntry.COLUMN_PRODUCT_QUANTITY)));
+            int priceInCents = cursor.getInt(cursor.getColumnIndex(
+                    GameStoreContract.ProductWithSupplierEntry.COLUMN_PRODUCT_PRICE));
+            mPriceTextView.setText(getString(R.string.list_item_price,
+                    ProductUtils.getDecimalPrice(priceInCents)));
+            int quantity = cursor.getInt(cursor.getColumnIndex(
+                    GameStoreContract.ProductWithSupplierEntry.COLUMN_PRODUCT_QUANTITY));
+            mQuantityTextView.setText(getString(R.string.list_item_quantity, quantity));
             mSupplierNameTextView.setText(cursor.getString(cursor.getColumnIndex(
                     GameStoreContract.ProductWithSupplierEntry.COLUMN_SUPPLIER_NAME)));
         } else {
