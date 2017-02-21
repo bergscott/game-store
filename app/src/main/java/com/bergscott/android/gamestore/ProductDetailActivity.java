@@ -18,11 +18,6 @@ import android.widget.Toast;
 
 import com.bergscott.android.gamestore.data.GameStoreContract;
 
-import java.math.BigDecimal;
-import java.net.URI;
-
-import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
-
 public class ProductDetailActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -62,24 +57,50 @@ public class ProductDetailActivity extends AppCompatActivity
         mShipmentButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // create a ContentValues object with the new quantity (increment the quantity by 1)
                 ContentValues values = new ContentValues();
                 values.put(GameStoreContract.ProductEntry.COLUMN_PRODUCT_QUANTITY, mQuantity + 1);
 
-                Uri uri = ContentUris.withAppendedId(GameStoreContract.ProductEntry.CONTENT_URI,
-                        ContentUris.parseId(mProductUri));
-
-                int rowsModified = getContentResolver().update(uri, values, null, null);
-
-                if (rowsModified == 0) {
-                    Toast.makeText(ProductDetailActivity.this, "Error with updating quantity",
-                            Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(ProductDetailActivity.this, "Quantity updated!",
-                            Toast.LENGTH_SHORT).show();
-                }
+                // update the entry in the database
+                updateQuantity(values);
             }
         });
 
+        mSaleButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // return early if quantity is 0
+                if (mQuantity == 0) {
+                    Toast.makeText(ProductDetailActivity.this, "No Quantity to Sell",
+                            Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                // create a ContentValues object with the new quantity (decrement quantity by 1)
+                ContentValues values = new ContentValues();
+                values.put(GameStoreContract.ProductEntry.COLUMN_PRODUCT_QUANTITY, mQuantity - 1);
+
+                // update the entry in the database
+                updateQuantity(values);
+            }
+        });
+    }
+
+    /**
+     * Updates the current product's quantity in the products table of the database
+     * @param values ContentValues containing quantity key and new value pair
+     */
+    private void updateQuantity(ContentValues values) {
+        Uri uri = ContentUris.withAppendedId(GameStoreContract.ProductEntry.CONTENT_URI,
+                ContentUris.parseId(mProductUri));
+
+        int rowsModified = getContentResolver().update(uri, values, null, null);
+
+        // if now row of the database was updated, show the user a message indicating an error
+        if (rowsModified == 0) {
+            Toast.makeText(ProductDetailActivity.this, "Error with updating quantity",
+                    Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
