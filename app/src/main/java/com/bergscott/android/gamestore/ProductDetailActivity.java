@@ -2,17 +2,21 @@ package com.bergscott.android.gamestore;
 
 import android.app.LoaderManager;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.bergscott.android.gamestore.data.GameStoreContract;
 
 import java.math.BigDecimal;
+import java.net.URI;
 
 import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
 
@@ -23,6 +27,8 @@ public class ProductDetailActivity extends AppCompatActivity
     TextView mPriceTextView;
     TextView mQuantityTextView;
     TextView mSupplierNameTextView;
+    Button mPhoneButton;
+    Button mWebButton;
 
     Uri mProductUri;
 
@@ -39,6 +45,8 @@ public class ProductDetailActivity extends AppCompatActivity
         mPriceTextView = (TextView) findViewById(R.id.detail_product_price);
         mQuantityTextView = (TextView) findViewById(R.id.detail_product_quantity);
         mSupplierNameTextView = (TextView) findViewById(R.id.detail_supplier_name);
+        mPhoneButton = (Button) findViewById(R.id.supplier_phone_button);
+        mWebButton = (Button) findViewById(R.id.supplier_web_button);
 
         getLoaderManager().initLoader(PRODUCT_LOADER, null, this);
 
@@ -64,6 +72,33 @@ public class ProductDetailActivity extends AppCompatActivity
             mQuantityTextView.setText(getString(R.string.list_item_quantity, quantity));
             mSupplierNameTextView.setText(cursor.getString(cursor.getColumnIndex(
                     GameStoreContract.ProductWithSupplierEntry.COLUMN_SUPPLIER_NAME)));
+
+            final Uri phoneUri = Uri.parse("tel:" + cursor.getString(cursor.getColumnIndex(
+                    GameStoreContract.ProductWithSupplierEntry.COLUMN_SUPPLIER_PHONE)));
+
+            mPhoneButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent phoneIntent = new Intent(Intent.ACTION_VIEW, phoneUri);
+                    if (phoneIntent.resolveActivity(getPackageManager()) != null) {
+                        startActivity(phoneIntent);
+                    }
+                }
+            });
+
+            final Uri webUri = Uri.parse(cursor.getString(cursor.getColumnIndex(
+                    GameStoreContract.ProductWithSupplierEntry.COLUMN_SUPPLIER_WEB)));
+
+            mWebButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent webIntent = new Intent(Intent.ACTION_VIEW, webUri);
+                    if (webIntent.resolveActivity(getPackageManager()) != null) {
+                        startActivity(webIntent);
+                    }
+                }
+            });
+
         } else {
             Log.w("ProductDetailActivity", "Loader returned empty cursor");
         }
