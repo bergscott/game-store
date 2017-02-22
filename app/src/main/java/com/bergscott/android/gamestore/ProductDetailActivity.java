@@ -18,12 +18,15 @@ import android.widget.Toast;
 
 import com.bergscott.android.gamestore.data.GameStoreContract;
 
+import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
+
 public class ProductDetailActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<Cursor> {
 
     TextView mNameTextView;
     TextView mPriceTextView;
     TextView mQuantityTextView;
+    View mSupplierLayout;
     TextView mSupplierNameTextView;
     Button mPhoneButton;
     Button mWebButton;
@@ -32,7 +35,7 @@ public class ProductDetailActivity extends AppCompatActivity
 
     Uri mProductUri;
 
-    int mQuantity = 0;
+    int mQuantity;
 
     private final int PRODUCT_LOADER = 0;
 
@@ -46,6 +49,7 @@ public class ProductDetailActivity extends AppCompatActivity
         mNameTextView = (TextView) findViewById(R.id.detail_product_name);
         mPriceTextView = (TextView) findViewById(R.id.detail_product_price);
         mQuantityTextView = (TextView) findViewById(R.id.detail_product_quantity);
+        mSupplierLayout =  findViewById(R.id.detail_supplier_layout);
         mSupplierNameTextView = (TextView) findViewById(R.id.detail_supplier_name);
         mPhoneButton = (Button) findViewById(R.id.supplier_phone_button);
         mWebButton = (Button) findViewById(R.id.supplier_web_button);
@@ -122,59 +126,67 @@ public class ProductDetailActivity extends AppCompatActivity
             mQuantity = cursor.getInt(cursor.getColumnIndex(
                     GameStoreContract.ProductWithSupplierEntry.COLUMN_PRODUCT_QUANTITY));
             mQuantityTextView.setText(getString(R.string.list_item_quantity, mQuantity));
-            mSupplierNameTextView.setText(cursor.getString(cursor.getColumnIndex(
-                    GameStoreContract.ProductWithSupplierEntry.COLUMN_SUPPLIER_NAME)));
 
-            // setup the button to launch the phone dialer with the supplier's number
-            int phoneColumnIndex = cursor.getColumnIndex(
-                    GameStoreContract.ProductWithSupplierEntry.COLUMN_SUPPLIER_PHONE);
-
-            // if phone number is Null, hide the button
-            if (cursor.isNull(phoneColumnIndex)) {
-                mPhoneButton.setVisibility(View.GONE);
+            // Hide the supplier layout if there is no supplier
+            if (cursor.isNull(cursor.getColumnIndex(
+                    GameStoreContract.ProductWithSupplierEntry.COLUMN_SUPPLIER_NAME))) {
+                mSupplierLayout.setVisibility(View.GONE);
             } else {
-                // phone number is not null, make button visible and set its OnClickListener
-                mPhoneButton.setVisibility(View.VISIBLE);
+                // setup the supplier info and buttons
+                mSupplierLayout.setVisibility(View.VISIBLE);
+                mSupplierNameTextView.setText(cursor.getString(cursor.getColumnIndex(
+                        GameStoreContract.ProductWithSupplierEntry.COLUMN_SUPPLIER_NAME)));
 
-                final Uri phoneUri = Uri.parse("tel:" + cursor.getString(cursor.getColumnIndex(
-                        GameStoreContract.ProductWithSupplierEntry.COLUMN_SUPPLIER_PHONE)));
+                // setup the button to launch the phone dialer with the supplier's number
+                int phoneColumnIndex = cursor.getColumnIndex(
+                        GameStoreContract.ProductWithSupplierEntry.COLUMN_SUPPLIER_PHONE);
 
-                mPhoneButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Intent phoneIntent = new Intent(Intent.ACTION_VIEW, phoneUri);
-                        if (phoneIntent.resolveActivity(getPackageManager()) != null) {
-                            startActivity(phoneIntent);
+                // if phone number is Null, hide the button
+                if (cursor.isNull(phoneColumnIndex)) {
+                    mPhoneButton.setVisibility(View.GONE);
+                } else {
+                    // phone number is not null, make button visible and set its OnClickListener
+                    mPhoneButton.setVisibility(View.VISIBLE);
+
+                    final Uri phoneUri = Uri.parse("tel:" + cursor.getString(cursor.getColumnIndex(
+                            GameStoreContract.ProductWithSupplierEntry.COLUMN_SUPPLIER_PHONE)));
+
+                    mPhoneButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Intent phoneIntent = new Intent(Intent.ACTION_VIEW, phoneUri);
+                            if (phoneIntent.resolveActivity(getPackageManager()) != null) {
+                                startActivity(phoneIntent);
+                            }
                         }
-                    }
-                });
-            }
+                    });
+                }
 
-            // setup the button to launch the web browser with the supplier's url
-            int webColumnIndex = cursor.getColumnIndex(
-                    GameStoreContract.ProductWithSupplierEntry.COLUMN_SUPPLIER_WEB);
+                // setup the button to launch the web browser with the supplier's url
+                int webColumnIndex = cursor.getColumnIndex(
+                        GameStoreContract.ProductWithSupplierEntry.COLUMN_SUPPLIER_WEB);
 
-            // if website is null, hide the button
-            if (cursor.isNull(webColumnIndex)) {
-                mWebButton.setVisibility(View.GONE);
-            } else {
-                // website is not null, so make button visible and set its OnClickListener
-                mWebButton.setVisibility(View.VISIBLE);
+                // if website is null, hide the button
+                if (cursor.isNull(webColumnIndex)) {
+                    mWebButton.setVisibility(View.GONE);
+                } else {
+                    // website is not null, so make button visible and set its OnClickListener
+                    mWebButton.setVisibility(View.VISIBLE);
 
-                final Uri webUri = Uri.parse(cursor.getString(cursor.getColumnIndex(
-                        GameStoreContract.ProductWithSupplierEntry.COLUMN_SUPPLIER_WEB)));
+                    final Uri webUri = Uri.parse(cursor.getString(cursor.getColumnIndex(
+                            GameStoreContract.ProductWithSupplierEntry.COLUMN_SUPPLIER_WEB)));
 
-                mWebButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Intent webIntent = new Intent(Intent.ACTION_VIEW, webUri);
-                        if (webIntent.resolveActivity(getPackageManager()) != null) {
-                            startActivity(webIntent);
+                    mWebButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Intent webIntent = new Intent(Intent.ACTION_VIEW, webUri);
+                            if (webIntent.resolveActivity(getPackageManager()) != null) {
+                                startActivity(webIntent);
+                            }
                         }
-                    }
-                });
+                    });
+                }
             }
-
         } else {
             Log.w("ProductDetailActivity", "Loader returned empty cursor");
         }

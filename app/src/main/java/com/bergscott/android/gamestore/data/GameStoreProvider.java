@@ -123,7 +123,7 @@ public class GameStoreProvider extends ContentProvider {
                 selectionArgs = new String[] { String.valueOf(ContentUris.parseId(uri)) };
 
                 cursor = database.rawQuery("SELECT * FROM "
-                        + ProductEntry.TABLE_NAME + " INNER JOIN "
+                        + ProductEntry.TABLE_NAME + " LEFT JOIN "
                         + SupplierEntry.TABLE_NAME + " ON "
                         + ProductEntry.TABLE_NAME + "." + ProductEntry.COLUMN_PRODUCT_SUPPLIER + "="
                         + SupplierEntry.TABLE_NAME + "." + SupplierEntry._ID
@@ -156,7 +156,36 @@ public class GameStoreProvider extends ContentProvider {
     }
 
     private Uri insertProduct(Uri uri, ContentValues values) {
-        // TODO: Sanity checks
+        // if the product name column is present check that the name is not null
+        if (values.containsKey(ProductEntry.COLUMN_PRODUCT_NAME)) {
+            String name = values.getAsString(ProductEntry.COLUMN_PRODUCT_NAME);
+            if (name == null) {
+                throw new IllegalArgumentException("Product requires a name");
+            }
+        } else {
+            throw new IllegalArgumentException("Product requires a name");
+        }
+
+        // if the product quantity column is present, check that it is valid (quantity can be null,
+        // as it has a default value of 0)
+        if (values.containsKey(ProductEntry.COLUMN_PRODUCT_QUANTITY)) {
+            Integer quantity = values.getAsInteger(ProductEntry.COLUMN_PRODUCT_QUANTITY);
+            if (quantity != null && quantity < 0) {
+                throw new IllegalArgumentException("Product requires a valid quantity");
+            }
+        }
+
+        // if the price column is present, check that it is not null and is valid
+        if (values.containsKey(ProductEntry.COLUMN_PRODUCT_PRICE)) {
+            Integer price = values.getAsInteger(ProductEntry.COLUMN_PRODUCT_PRICE);
+            if (price == null || price < 0) {
+                throw new IllegalArgumentException("Product requires a valid price");
+            }
+        } else {
+            throw new IllegalArgumentException("Product requires a valid price");
+        }
+
+        // check for supplier ID?
 
         return insertValuesToTable(uri, values, ProductEntry.TABLE_NAME);
     }

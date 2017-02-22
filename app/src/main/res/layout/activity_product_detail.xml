@@ -16,129 +16,154 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Name"
-            android:textSize="14sp" />
-
-        <TextView
-            android:id="@+id/detail_product_name"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="2"
-            tools:text="Product Name"
-            android:textSize="18sp" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingTop="12dp">
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:paddingTop="4dp"
-            android:text="Info"
-            android:textSize="14sp"/>
-
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:orientation="vertical">
+            android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/detail_product_price"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:textSize="18sp"
-                tools:text="Price: $19.99" />
+                android:layout_weight="1"
+                android:text="Name"
+                android:textSize="14sp" />
 
             <TextView
-                android:id="@+id/detail_product_quantity"
-                android:layout_width="match_parent"
+                android:id="@+id/detail_product_name"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="2"
                 android:textSize="18sp"
-                tools:text="Quantity: 18" />
+                tools:text="Product Name" />
         </LinearLayout>
 
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingTop="12dp">
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:paddingTop="4dp"
-            android:text="Supplier"
-            android:textSize="14sp" />
-
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:orientation="vertical">
+            android:orientation="horizontal"
+            android:paddingTop="12dp">
 
             <TextView
-                android:id="@+id/detail_supplier_name"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:textSize="18sp"
-                tools:text="CoolStuffInc" />
+                android:layout_weight="1"
+                android:paddingTop="4dp"
+                android:text="Info"
+                android:textSize="14sp" />
 
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/detail_product_price"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    tools:text="Price: $19.99" />
+
+                <TextView
+                    android:id="@+id/detail_product_quantity"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    tools:text="Quantity: 18" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/detail_supplier_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="12dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingTop="4dp"
+                android:text="Supplier"
+                android:textSize="14sp" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/detail_supplier_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="18sp"
+                        tools:text="CoolStuffInc" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <Button
+                            android:id="@+id/supplier_phone_button"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="-4dp"
+                            android:text="Phone" />
+
+                        <Button
+                            android:id="@+id/supplier_web_button"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Website" />
+
+                </LinearLayout>
+
+
+
+            </LinearLayout>
+        </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:layout_marginTop="16dp">
 
-                <Button
-                    android:id="@+id/supplier_phone_button"
-                    android:layout_width="wrap_content"
+                <TextView
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="-4dp"
-                    android:text="Phone" />
+                    android:layout_weight="1"
+                    android:text="Transactions"
+                    android:layout_marginTop="8dp"/>
 
-                <Button
-                    android:id="@+id/supplier_web_button"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="Website" />
+                    android:layout_weight="2"
+                    android:orientation="vertical">
 
-            </LinearLayout>
+                    <Button
+                        android:id="@+id/detail_shipment_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="-4dp"
+                        android:text="Receive Shipment" />
 
-            <Button
-                android:id="@+id/detail_shipment_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Receive Shipment"
-                android:layout_marginLeft="-4dp"/>
+                    <Button
+                        android:id="@+id/detail_sale_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="-4dp"
+                        android:text="Sale" />
+
+                </LinearLayout>
 
         </LinearLayout>
     </LinearLayout>
-    </LinearLayout>
 
-    <Button
-        android:id="@+id/detail_sale_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:text="Sale"
-        android:textSize="40sp"/>
+
 
 </RelativeLayout>

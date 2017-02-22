@@ -123,8 +123,6 @@ public class EditProductActivity extends AppCompatActivity {
         String nameString = mNameEditText.getText().toString().trim();
         String priceString = mPriceEditText.getText().toString().trim();
         String quantityString = mQuantityEditText.getText().toString().trim();
-        int price = 0;
-        int quantity = 0;
 
         if (TextUtils.isEmpty(nameString) && TextUtils.isEmpty(priceString)
                 && TextUtils.isEmpty(quantityString)) {
@@ -132,31 +130,40 @@ public class EditProductActivity extends AppCompatActivity {
             return;
         }
 
+        ContentValues values = new ContentValues();
+
+        if (!TextUtils.isEmpty(nameString)) {
+            values.put(ProductEntry.COLUMN_PRODUCT_NAME, nameString);
+        }
+
         if (!TextUtils.isEmpty(priceString)) {
             BigDecimal priceBigDecimal = new BigDecimal(priceString);
-            price = priceBigDecimal.movePointRight(2).intValue();
+            int price = priceBigDecimal.movePointRight(2).intValue();
+            values.put(ProductEntry.COLUMN_PRODUCT_PRICE, price);
         }
 
         if (!TextUtils.isEmpty(quantityString)) {
-            quantity = Integer.parseInt(quantityString);
+            int quantity = Integer.parseInt(quantityString);
+            values.put(ProductEntry.COLUMN_PRODUCT_QUANTITY, quantity);
         }
 
-        ContentValues values = new ContentValues();
-        values.put(ProductEntry.COLUMN_PRODUCT_NAME, nameString);
-        values.put(ProductEntry.COLUMN_PRODUCT_PRICE, price);
-        values.put(ProductEntry.COLUMN_PRODUCT_QUANTITY, quantity);
         // Only include a supplier if a supplier was selected
         if (mSupplier != NO_SUPPLIER) {
             values.put(ProductEntry.COLUMN_PRODUCT_SUPPLIER, mSupplier);
         }
 
-        Uri resultUri = getContentResolver().insert(ProductEntry.CONTENT_URI, values);
 
-        // check the resulting URI to see if the insert operatoin was a success and show a Toast
-        if (resultUri == null) {
-            Toast.makeText(this, "Error with saving product", Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(this, "Product added!", Toast.LENGTH_SHORT).show();
+        try {
+            Uri resultUri = getContentResolver().insert(ProductEntry.CONTENT_URI, values);
+
+            // check the resulting URI to see if the insert operation was a success and show a Toast
+            if (resultUri == null) {
+                Toast.makeText(this, "Error with saving product", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Product added!", Toast.LENGTH_SHORT).show();
+            }
+        } catch (IllegalArgumentException e) {
+            Toast.makeText(this, "Not saved: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
 
     }
