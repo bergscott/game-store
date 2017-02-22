@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.bergscott.android.gamestore.data.GameStoreContract;
 
+import static android.icu.lang.UCharacter.GraphemeClusterBreak.L;
 import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
 
 public class ProductDetailActivity extends AppCompatActivity

@@ -73,13 +73,17 @@ public class EditSupplierActivity extends AppCompatActivity {
         }
 
         // insert the supplier into the database
-        Uri resultUri = getContentResolver().insert(SupplierEntry.CONTENT_URI, values);
+        try {
+            Uri resultUri = getContentResolver().insert(SupplierEntry.CONTENT_URI, values);
 
-        // check the resulting URI to see if the insert operatoin was a success and show a Toast
-        if (resultUri == null) {
-            Toast.makeText(this, "Error with saving supplier", Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(this, "Supplier added!", Toast.LENGTH_SHORT).show();
+            // check the resulting URI to see if the insert operatoin was a success and show a Toast
+            if (resultUri == null) {
+                Toast.makeText(this, "Error with saving supplier", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Supplier added!", Toast.LENGTH_SHORT).show();
+            }
+        } catch (IllegalArgumentException e) {
+            Toast.makeText(this, "Not saved: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 }

@@ -8,13 +8,18 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.Log;
-
-import static android.R.attr.data;
+import android.util.Patterns;
+import android.webkit.URLUtil;
 
 import com.bergscott.android.gamestore.data.GameStoreContract.ProductEntry;
 import com.bergscott.android.gamestore.data.GameStoreContract.SupplierEntry;
-import com.bergscott.android.gamestore.data.GameStoreContract.ProductWithSupplierEntry;
+
+import org.w3c.dom.Text;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * Created by bergs on 2/15/2017.
@@ -24,6 +29,19 @@ public class GameStoreProvider extends ContentProvider {
 
     /** Tag for log messages */
     public static final String LOG_TAG = GameStoreProvider.class.getSimpleName();
+
+    private final IllegalArgumentException PRODUCT_NAME_EXCEPTION =
+            new IllegalArgumentException("Product requires a name");
+    private final IllegalArgumentException PRODUCT_QUANTITY_EXCEPTION =
+            new IllegalArgumentException("Product requires a valid quantity");
+    private final IllegalArgumentException PRODUCT_PRICE_EXCEPTION =
+            new IllegalArgumentException("Product requires a valid price");
+    private final IllegalArgumentException SUPPLIER_NAME_EXCEPTION =
+            new IllegalArgumentException("Supplier requires a name");
+    private final IllegalArgumentException SUPPLIER_URL_EXCEPTION =
+            new IllegalArgumentException("Invalid URL entered for supplier");
+    private final IllegalArgumentException SUPPLIER_PHONE_EXCEPTION =
+            new IllegalArgumentException("Invalid phone number entered");
 
     /** Database Helper for Pet SQL Database */
     private GameStoreDbHelper mDbHelper;
@@ -156,14 +174,15 @@ public class GameStoreProvider extends ContentProvider {
     }
 
     private Uri insertProduct(Uri uri, ContentValues values) {
-        // if the product name column is present check that the name is not null
+        // if the product name column is present check that the name is not null or empty
         if (values.containsKey(ProductEntry.COLUMN_PRODUCT_NAME)) {
             String name = values.getAsString(ProductEntry.COLUMN_PRODUCT_NAME);
-            if (name == null) {
-                throw new IllegalArgumentException("Product requires a name");
+            if (TextUtils.isEmpty(name)) {
+                throw PRODUCT_NAME_EXCEPTION;
             }
         } else {
-            throw new IllegalArgumentException("Product requires a name");
+            // if not present, throw an exception
+            throw PRODUCT_NAME_EXCEPTION;
         }
 
         // if the product quantity column is present, check that it is valid (quantity can be null,
@@ -171,7 +190,7 @@ public class GameStoreProvider extends ContentProvider {
         if (values.containsKey(ProductEntry.COLUMN_PRODUCT_QUANTITY)) {
             Integer quantity = values.getAsInteger(ProductEntry.COLUMN_PRODUCT_QUANTITY);
             if (quantity != null && quantity < 0) {
-                throw new IllegalArgumentException("Product requires a valid quantity");
+                throw PRODUCT_QUANTITY_EXCEPTION;
             }
         }
 
@@ -179,10 +198,10 @@ public class GameStoreProvider extends ContentProvider {
         if (values.containsKey(ProductEntry.COLUMN_PRODUCT_PRICE)) {
             Integer price = values.getAsInteger(ProductEntry.COLUMN_PRODUCT_PRICE);
             if (price == null || price < 0) {
-                throw new IllegalArgumentException("Product requires a valid price");
+                throw PRODUCT_PRICE_EXCEPTION;
             }
         } else {
-            throw new IllegalArgumentException("Product requires a valid price");
+            throw PRODUCT_PRICE_EXCEPTION;
         }
 
         // check for supplier ID?
@@ -191,7 +210,38 @@ public class GameStoreProvider extends ContentProvider {
     }
 
     private Uri insertSupplier(Uri uri, ContentValues values) {
-        // TODO: Sanity checks
+        // if the supplier name column is empty or not present, throw an exception
+        if (values.containsKey(SupplierEntry.COLUMN_SUPPLIER_NAME)) {
+            String name = values.getAsString(SupplierEntry.COLUMN_SUPPLIER_NAME);
+            if (TextUtils.isEmpty(name)) {
+                throw SUPPLIER_NAME_EXCEPTION;
+            }
+        } else {
+            throw SUPPLIER_NAME_EXCEPTION;
+        }
+
+        // if the supplier web column is present, check to see if it is a valid url
+        if (values.containsKey(SupplierEntry.COLUMN_SUPPLIER_WEB)) {
+            String urlString = values.getAsString(SupplierEntry.COLUMN_SUPPLIER_WEB);
+            if(!Patterns.WEB_URL.matcher(urlString).matches()
+                    || !URLUtil.isValidUrl(urlString)) {
+                urlString = "http://" + urlString;
+                if (Patterns.WEB_URL.matcher(urlString).matches()) {
+                    values.put(SupplierEntry.COLUMN_SUPPLIER_WEB, urlString);
+                } else {
+                    throw SUPPLIER_URL_EXCEPTION;
+                }
+            }
+        }
+
+        // if the supplier phone column is present and is too short to be a phone number, throw
+        // an exception
+        if (values.containsKey(SupplierEntry.COLUMN_SUPPLIER_PHONE)) {
+            String phoneString = values.getAsString(SupplierEntry.COLUMN_SUPPLIER_PHONE);
+            if (phoneString.length() < 4) {
+                throw SUPPLIER_PHONE_EXCEPTION;
+            }
+        }
 
         return insertValuesToTable(uri, values, SupplierEntry.TABLE_NAME);
     }
@@ -252,11 +302,11 @@ public class GameStoreProvider extends ContentProvider {
     
     private int updateProduct(Uri uri, ContentValues values, String selection, 
                               String[] selectionArgs) {
-        // if the product name column is present check that the name is not null
+        // if the product name column is present check that the name is not null or empty
         if (values.containsKey(ProductEntry.COLUMN_PRODUCT_NAME)) {
             String name = values.getAsString(ProductEntry.COLUMN_PRODUCT_NAME);
-            if (name == null) {
-                throw new IllegalArgumentException("Product requires a name");
+            if (TextUtils.isEmpty(name)) {
+                throw PRODUCT_NAME_EXCEPTION;
             }
         }
 
@@ -265,7 +315,7 @@ public class GameStoreProvider extends ContentProvider {
         if (values.containsKey(ProductEntry.COLUMN_PRODUCT_QUANTITY)) {
             Integer quantity = values.getAsInteger(ProductEntry.COLUMN_PRODUCT_QUANTITY);
             if (quantity != null && quantity < 0) {
-                throw new IllegalArgumentException("Product requires a valid quantity");
+                throw PRODUCT_QUANTITY_EXCEPTION;
             }
         }
 
@@ -273,7 +323,7 @@ public class GameStoreProvider extends ContentProvider {
         if (values.containsKey(ProductEntry.COLUMN_PRODUCT_PRICE)) {
             Integer price = values.getAsInteger(ProductEntry.COLUMN_PRODUCT_PRICE);
             if (price == null || price < 0) {
-                throw new IllegalArgumentException("Product requires a valid price");
+                throw PRODUCT_PRICE_EXCEPTION;
             }
         }
 
@@ -285,7 +335,31 @@ public class GameStoreProvider extends ContentProvider {
     
     private int updateSupplier(Uri uri, ContentValues values, String selection, 
                                String[] selectionArgs) {
-        //TODO: Sanity checks
+        // if the supplier name column is present and is empty, throw an exception
+        if (values.containsKey(SupplierEntry.COLUMN_SUPPLIER_NAME)) {
+            String name = values.getAsString(SupplierEntry.COLUMN_SUPPLIER_NAME);
+            if (TextUtils.isEmpty(name)) {
+                throw SUPPLIER_NAME_EXCEPTION;
+            }
+        }
+
+        // if the supplier web column is present, check to see if it is a valid url
+        if (values.containsKey(SupplierEntry.COLUMN_SUPPLIER_WEB)) {
+            String urlString = values.getAsString(SupplierEntry.COLUMN_SUPPLIER_WEB);
+            if(!Patterns.WEB_URL.matcher(urlString).matches()) {
+                throw SUPPLIER_URL_EXCEPTION;
+            }
+        }
+
+        // if the supplier phone column is present and is too short to be a phone number, throw
+        // an exception
+        if (values.containsKey(SupplierEntry.COLUMN_SUPPLIER_PHONE)) {
+            String phoneString = values.getAsString(SupplierEntry.COLUMN_SUPPLIER_PHONE);
+            if (phoneString.length() < 4) {
+                throw SUPPLIER_PHONE_EXCEPTION;
+            }
+        }
+
         return updateTable(SupplierEntry.TABLE_NAME, uri, values, selection, selectionArgs);
     }
 
