@@ -14,4 +14,14 @@
         android:title="Add a supplier"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/action_delete_all_products"
+        android:title="Delete all products"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_delete_all_suppliers"
+        android:title="Delete all suppliers"
+        app:showAsAction="never" />
+
 </menu>

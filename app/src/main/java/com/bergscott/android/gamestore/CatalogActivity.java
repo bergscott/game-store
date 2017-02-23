@@ -6,17 +6,23 @@ import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.bergscott.android.gamestore.data.GameStoreContract;
 import com.bergscott.android.gamestore.data.GameStoreContract.ProductEntry;
+import com.bergscott.android.gamestore.data.GameStoreDbHelper;
+
+import static android.R.attr.data;
 
 
 public class CatalogActivity extends AppCompatActivity
@@ -107,6 +113,16 @@ public class CatalogActivity extends AppCompatActivity
             case R.id.action_add_supplier:
                 Intent intentSupplier = new Intent(CatalogActivity.this, EditSupplierActivity.class);
                 startActivity(intentSupplier);
+                return true;
+            case R.id.action_delete_all_products:
+                int productsDeleted = getContentResolver().delete(
+                        ProductEntry.CONTENT_URI, null, null);
+                Log.v("DeleteAllProducts", "Rows Deleted: " + productsDeleted);
+                return true;
+            case R.id.action_delete_all_suppliers:
+                int suppliersDeleted = getContentResolver().delete(
+                        GameStoreContract.SupplierEntry.CONTENT_URI, null, null);
+                Log.v("DeleteAllSuppliers", "Rows Deleted: " + suppliersDeleted);
                 return true;
         }
         return super.onOptionsItemSelected(item);

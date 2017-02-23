@@ -274,8 +274,67 @@ public class GameStoreProvider extends ContentProvider {
     }
 
     @Override
-    public int delete(Uri uri, String s, String[] strings) {
-        return 0;
+    public int delete(Uri uri, String selection, String[] selectionArgs) {
+        SQLiteDatabase database = mDbHelper.getWritableDatabase();
+        int rowsDeleted;
+        ContentValues nullSupplierId;
+        String productSelection;
+        String[] productSelectionArgs;
+
+        final int match = sUriMatcher.match(uri);
+        switch (match) {
+            case PRODUCTS:
+                rowsDeleted = database.delete(ProductEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            case PRODUCT_ID:
+                selection = ProductEntry._ID + "=?";
+                selectionArgs = new String[] { String.valueOf(ContentUris.parseId(uri)) };
+                rowsDeleted = database.delete(ProductEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            case SUPPLIERS:
+                // first update the supplier_id of any products with the supplier id(s)
+                // to be deleted to NULL
+                nullSupplierId = new ContentValues();
+                nullSupplierId.putNull(ProductEntry.COLUMN_PRODUCT_SUPPLIER);
+                productSelection = ProductEntry.COLUMN_PRODUCT_SUPPLIER + " IN (SELECT "
+                        + SupplierEntry._ID + " FROM " + SupplierEntry.TABLE_NAME;
+                if (selection == null) {
+                    productSelection += ")";
+                } else {
+                    productSelection += (" WHERE " + selection + ")");
+                }
+
+                database.update(ProductEntry.TABLE_NAME, nullSupplierId, productSelection,
+                        selectionArgs);
+
+                // now delete the supplier entries selected
+                rowsDeleted = database.delete(SupplierEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            case SUPPLIER_ID:
+                // first update the supplier_id of any products with the supplier id to be deleted
+                // to NULL
+                nullSupplierId = new ContentValues();
+                nullSupplierId.putNull(ProductEntry.COLUMN_PRODUCT_SUPPLIER);
+                productSelection = ProductEntry.COLUMN_PRODUCT_SUPPLIER + "=?";
+                productSelectionArgs =
+                        new String[] { String.valueOf(ContentUris.parseId(uri)) };
+                database.update(ProductEntry.TABLE_NAME, nullSupplierId,
+                        productSelection, productSelectionArgs);
+
+                // now delete the supplier
+                selection = SupplierEntry._ID + "=?";
+                selectionArgs = new String[] { String.valueOf(ContentUris.parseId(uri)) };
+                rowsDeleted = database.delete(SupplierEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            default:
+                throw new IllegalArgumentException("Delete not supported for " + uri);
+        }
+        // notify the content resolver if any rows were deleted
+        if (rowsDeleted != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+        // return the number of rows deleted
+        return rowsDeleted;
     }
 
     @Override
