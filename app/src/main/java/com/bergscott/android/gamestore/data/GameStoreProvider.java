@@ -277,9 +277,8 @@ public class GameStoreProvider extends ContentProvider {
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         SQLiteDatabase database = mDbHelper.getWritableDatabase();
         int rowsDeleted;
-        ContentValues nullSupplierId;
+        int productsUpdated = 0;
         String productSelection;
-        String[] productSelectionArgs;
 
         final int match = sUriMatcher.match(uri);
         switch (match) {
@@ -292,20 +291,23 @@ public class GameStoreProvider extends ContentProvider {
                 rowsDeleted = database.delete(ProductEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             case SUPPLIERS:
-                // first update the supplier_id of any products with the supplier id(s)
-                // to be deleted to NULL
-                nullSupplierId = new ContentValues();
-                nullSupplierId.putNull(ProductEntry.COLUMN_PRODUCT_SUPPLIER);
-                productSelection = ProductEntry.COLUMN_PRODUCT_SUPPLIER + " IN (SELECT "
-                        + SupplierEntry._ID + " FROM " + SupplierEntry.TABLE_NAME;
+                // if the selection is null, then all suppliers will be deleted. Set selection to
+                // null so all supplier_id fields of all products will be set to null
                 if (selection == null) {
-                    productSelection += ")";
+                    productSelection = null;
                 } else {
-                    productSelection += (" WHERE " + selection + ")");
+                    // setup the productSelection to select only the products with supplier_ids
+                    // of suppliers that will be deleted based on the selection and selectionArgs
+                    // parameters
+                    productSelection = ProductEntry.COLUMN_PRODUCT_SUPPLIER + " IN (SELECT "
+                            + SupplierEntry._ID + " FROM " + SupplierEntry.TABLE_NAME
+                            + (" WHERE " + selection + ")");
                 }
 
-                database.update(ProductEntry.TABLE_NAME, nullSupplierId, productSelection,
-                        selectionArgs);
+                // perform the update to the database, setting the supplier_id of all products with
+                // suppliers to be deleted to NULL
+                productsUpdated = database.update(ProductEntry.TABLE_NAME, getNullSupplierContentValues(),
+                        productSelection, selectionArgs);
 
                 // now delete the supplier entries selected
                 rowsDeleted = database.delete(SupplierEntry.TABLE_NAME, selection, selectionArgs);
@@ -313,17 +315,13 @@ public class GameStoreProvider extends ContentProvider {
             case SUPPLIER_ID:
                 // first update the supplier_id of any products with the supplier id to be deleted
                 // to NULL
-                nullSupplierId = new ContentValues();
-                nullSupplierId.putNull(ProductEntry.COLUMN_PRODUCT_SUPPLIER);
                 productSelection = ProductEntry.COLUMN_PRODUCT_SUPPLIER + "=?";
-                productSelectionArgs =
-                        new String[] { String.valueOf(ContentUris.parseId(uri)) };
-                database.update(ProductEntry.TABLE_NAME, nullSupplierId,
-                        productSelection, productSelectionArgs);
-
-                // now delete the supplier
-                selection = SupplierEntry._ID + "=?";
                 selectionArgs = new String[] { String.valueOf(ContentUris.parseId(uri)) };
+                productsUpdated = database.update(ProductEntry.TABLE_NAME,
+                        getNullSupplierContentValues(), productSelection, selectionArgs);
+
+                // now delete the supplier indicated by the URI
+                selection = SupplierEntry._ID + "=?";
                 rowsDeleted = database.delete(SupplierEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             default:
@@ -333,8 +331,22 @@ public class GameStoreProvider extends ContentProvider {
         if (rowsDeleted != 0) {
             getContext().getContentResolver().notifyChange(uri, null);
         }
+        // notify the content resolver if any product rows were updated
+        if (productsUpdated != 0) {
+            getContext().getContentResolver().notifyChange(ProductEntry.CONTENT_URI, null);
+        }
         // return the number of rows deleted
         return rowsDeleted;
+    }
+
+    /**
+     * Returns a ContentValues object used to set the supplier_id field of a products entry to NULL
+     * @return ContentValues with key/value of supplier_id/NULL
+     */
+    private ContentValues getNullSupplierContentValues() {
+        ContentValues values = new ContentValues();
+        values.putNull(ProductEntry.COLUMN_PRODUCT_SUPPLIER);
+        return values;
     }
 
     @Override
