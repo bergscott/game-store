@@ -24,6 +24,7 @@
         </activity>
         <activity
             android:name=".EditProductActivity"
+            android:label="Product Details"
             android:parentActivityName=".CatalogActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

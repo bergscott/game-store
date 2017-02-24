@@ -11,6 +11,8 @@ import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -199,5 +201,23 @@ public class ProductDetailActivity extends AppCompatActivity
         mPriceTextView.setText(null);
         mQuantityTextView.setText(null);
         mSupplierNameTextView.setText(null);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_product_detail, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_edit_product:
+                Intent intent = new Intent(ProductDetailActivity.this, EditProductActivity.class);
+                intent.setData(mProductUri);
+                startActivity(intent);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

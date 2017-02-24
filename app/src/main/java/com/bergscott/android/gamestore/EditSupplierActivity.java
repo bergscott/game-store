@@ -43,7 +43,7 @@ public class EditSupplierActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_save_supplier:
+            case R.id.action_save_entry:
                 saveSupplier();
                 finish();
                 return true;

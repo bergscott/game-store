@@ -306,8 +306,8 @@ public class GameStoreProvider extends ContentProvider {
 
                 // perform the update to the database, setting the supplier_id of all products with
                 // suppliers to be deleted to NULL
-                productsUpdated = database.update(ProductEntry.TABLE_NAME, getNullSupplierContentValues(),
-                        productSelection, selectionArgs);
+                productsUpdated = database.update(ProductEntry.TABLE_NAME,
+                        getNullSupplierContentValues(), productSelection, selectionArgs);
 
                 // now delete the supplier entries selected
                 rowsDeleted = database.delete(SupplierEntry.TABLE_NAME, selection, selectionArgs);
