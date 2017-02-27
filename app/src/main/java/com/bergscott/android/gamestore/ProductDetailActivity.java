@@ -20,9 +20,6 @@ import android.widget.Toast;
 
 import com.bergscott.android.gamestore.data.GameStoreContract;
 
-import static android.icu.lang.UCharacter.GraphemeClusterBreak.L;
-import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
-
 public class ProductDetailActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -36,7 +33,7 @@ public class ProductDetailActivity extends AppCompatActivity
     Button mShipmentButton;
     Button mSaleButton;
 
-    Uri mProductUri;
+    Uri mProductWithSupplierUri;
 
     int mQuantity;
 
@@ -47,7 +44,7 @@ public class ProductDetailActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_product_detail);
 
-        mProductUri = getIntent().getData();
+        mProductWithSupplierUri = getIntent().getData();
 
         mNameTextView = (TextView) findViewById(R.id.detail_product_name);
         mPriceTextView = (TextView) findViewById(R.id.detail_product_price);
@@ -99,7 +96,7 @@ public class ProductDetailActivity extends AppCompatActivity
      */
     private void updateQuantity(ContentValues values) {
         Uri uri = ContentUris.withAppendedId(GameStoreContract.ProductEntry.CONTENT_URI,
-                ContentUris.parseId(mProductUri));
+                ContentUris.parseId(mProductWithSupplierUri));
 
         int rowsModified = getContentResolver().update(uri, values, null, null);
 
@@ -112,7 +109,7 @@ public class ProductDetailActivity extends AppCompatActivity
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        return new CursorLoader(this, mProductUri, null, null, null, null);
+        return new CursorLoader(this, mProductWithSupplierUri, null, null, null, null);
     }
 
     @Override
@@ -214,7 +211,10 @@ public class ProductDetailActivity extends AppCompatActivity
         switch (item.getItemId()) {
             case R.id.action_edit_product:
                 Intent intent = new Intent(ProductDetailActivity.this, EditProductActivity.class);
-                intent.setData(mProductUri);
+                // set the data to the current product's URI, since it is only the product
+                // that is being edited
+                intent.setData(ContentUris.withAppendedId(GameStoreContract.ProductEntry.CONTENT_URI,
+                        ContentUris.parseId(mProductWithSupplierUri)));
                 startActivity(intent);
                 return true;
         }

@@ -71,8 +71,7 @@ public class EditProductActivity extends AppCompatActivity
         mQuantityEditText = (EditText) findViewById(R.id.edit_text_product_quantity);
         mSupplierSpinner = (Spinner) findViewById(R.id.spinner_supplier);
 
-        mProductUri = ContentUris.withAppendedId(ProductEntry.CONTENT_URI,
-                ContentUris.parseId(getIntent().getData()));
+        mProductUri = getIntent().getData();
 
         if (mProductUri == null) {
             setTitle("Create Product");
