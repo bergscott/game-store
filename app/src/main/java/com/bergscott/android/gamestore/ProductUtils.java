@@ -15,4 +15,6 @@ public final class ProductUtils {
     public final static BigDecimal getDecimalPrice(int priceInCents) {
         return new BigDecimal(priceInCents).movePointLeft(2);
     }
+
+    public final static int DELETED_RESULT_CODE = 1;
 }

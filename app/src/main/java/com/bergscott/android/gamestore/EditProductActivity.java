@@ -244,6 +244,7 @@ public class EditProductActivity extends AppCompatActivity
                 return true;
             case R.id.action_delete_entry:
                 deleteProduct();
+                setResult(ProductUtils.DELETED_RESULT_CODE);
                 finish();
                 return true;
         }

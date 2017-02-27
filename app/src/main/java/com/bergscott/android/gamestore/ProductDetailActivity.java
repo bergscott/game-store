@@ -38,6 +38,7 @@ public class ProductDetailActivity extends AppCompatActivity
     int mQuantity;
 
     private final int PRODUCT_LOADER = 0;
+    private final int REQUEST_DELETE = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -215,9 +216,39 @@ public class ProductDetailActivity extends AppCompatActivity
                 // that is being edited
                 intent.setData(ContentUris.withAppendedId(GameStoreContract.ProductEntry.CONTENT_URI,
                         ContentUris.parseId(mProductWithSupplierUri)));
-                startActivity(intent);
+                startActivityForResult(intent, REQUEST_DELETE);
+                return true;
+            case R.id.action_delete_entry:
+                deleteProduct();
+                finish();
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void deleteProduct() {
+
+        // delete the product that is being shown
+        int rowsDeleted = getContentResolver().delete(
+                ContentUris.withAppendedId(GameStoreContract.ProductEntry.CONTENT_URI,
+                        ContentUris.parseId(mProductWithSupplierUri)), null, null
+        );
+
+        // show a Toast message to the user indicated if deletion was successful
+        if (rowsDeleted == 0) {
+            Toast.makeText(this, "No Product Deleted", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "Product Deleted", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_DELETE) {
+            if (resultCode == ProductUtils.DELETED_RESULT_CODE) {
+                finish();
+            }
+        }
     }
 }
