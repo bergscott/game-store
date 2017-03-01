@@ -15,21 +15,31 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".SupplierCatalogActivity"
+            android:parentActivityName=".ProductCatalogActivity"
+            android:label="Edit Suppliers">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ProductCatalogActivity" />
+        </activity>
+
         <activity
             android:name=".EditSupplierActivity"
-            android:parentActivityName=".ProductCatalogActivity">
+            android:parentActivityName=".SupplierCatalogActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ProductCatalogActivity" />
+                android:value=".SupplierCatalogActivity" />
         </activity>
+
         <activity
             android:name=".EditProductActivity"
-            android:label="Product Details"
             android:parentActivityName=".ProductCatalogActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ProductCatalogActivity" />
         </activity>
+
         <activity
             android:name=".ProductDetailActivity"
             android:label="Product Detail"
@@ -44,7 +54,7 @@
             android:authorities="com.bergscott.android.gamestore"
             android:exported="false" />
 
-        <activity android:name=".SupplierCatalogActivity"></activity>
+
     </application>
 
 </manifest>
