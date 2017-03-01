@@ -4,10 +4,10 @@
     android:id="@+id/activity_catalog"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.bergscott.android.gamestore.CatalogActivity">
+    tools:context="com.bergscott.android.gamestore.ProductCatalogActivity">
 
     <ListView
-        android:id="@+id/list_view_game"
+        android:id="@+id/catalog_list_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 </RelativeLayout>

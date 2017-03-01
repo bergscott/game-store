@@ -6,7 +6,6 @@ import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,16 +15,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.bergscott.android.gamestore.data.GameStoreContract;
 import com.bergscott.android.gamestore.data.GameStoreContract.ProductEntry;
-import com.bergscott.android.gamestore.data.GameStoreDbHelper;
-
-import static android.R.attr.data;
 
 
-public class CatalogActivity extends AppCompatActivity
+public class ProductCatalogActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<Cursor> {
 
     /** ListView containing the list of products in the database */
@@ -44,7 +39,7 @@ public class CatalogActivity extends AppCompatActivity
         setContentView(R.layout.activity_catalog);
 
         // find the list view
-        mProductsListView = (ListView) findViewById(R.id.list_view_game);
+        mProductsListView = (ListView) findViewById(R.id.catalog_list_view);
 
         // setup the cursor adapter and set it to the list view
         mProductCursorAdapter = new ProductCursorAdapter(this, null);
@@ -55,7 +50,7 @@ public class CatalogActivity extends AppCompatActivity
         mProductsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                Intent intent = new Intent(CatalogActivity.this, ProductDetailActivity.class);
+                Intent intent = new Intent(ProductCatalogActivity.this, ProductDetailActivity.class);
                 intent.setData(ContentUris.withAppendedId(
                         GameStoreContract.ProductWithSupplierEntry.CONTENT_URI, id
                 ));
@@ -107,11 +102,11 @@ public class CatalogActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_add_prodcut:
-                Intent intentProduct = new Intent(CatalogActivity.this, EditProductActivity.class);
+                Intent intentProduct = new Intent(ProductCatalogActivity.this, EditProductActivity.class);
                 startActivity(intentProduct);
                 return true;
             case R.id.action_add_supplier:
-                Intent intentSupplier = new Intent(CatalogActivity.this, EditSupplierActivity.class);
+                Intent intentSupplier = new Intent(ProductCatalogActivity.this, EditSupplierActivity.class);
                 startActivity(intentSupplier);
                 return true;
             case R.id.action_delete_all_products:

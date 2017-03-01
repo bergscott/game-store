@@ -8,7 +8,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".CatalogActivity">
+        <activity android:name=".ProductCatalogActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -17,26 +17,26 @@
         </activity>
         <activity
             android:name=".EditSupplierActivity"
-            android:parentActivityName=".CatalogActivity">
+            android:parentActivityName=".ProductCatalogActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".CatalogActivity" />
+                android:value=".ProductCatalogActivity" />
         </activity>
         <activity
             android:name=".EditProductActivity"
             android:label="Product Details"
-            android:parentActivityName=".CatalogActivity">
+            android:parentActivityName=".ProductCatalogActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".CatalogActivity" />
+                android:value=".ProductCatalogActivity" />
         </activity>
-
-        <activity android:name=".ProductDetailActivity"
-            android:parentActivityName=".CatalogActivity"
-            android:label="Product Detail">
+        <activity
+            android:name=".ProductDetailActivity"
+            android:label="Product Detail"
+            android:parentActivityName=".ProductCatalogActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".CatalogActivity" />
+                android:value=".ProductCatalogActivity" />
         </activity>
 
         <provider
@@ -44,7 +44,7 @@
             android:authorities="com.bergscott.android.gamestore"
             android:exported="false" />
 
-
+        <activity android:name=".SupplierCatalogActivity"></activity>
     </application>
 
 </manifest>
