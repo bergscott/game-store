@@ -9,12 +9,14 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.bergscott.android.gamestore.data.GameStoreContract;
 import com.bergscott.android.gamestore.data.GameStoreContract.SupplierEntry;
 
 public class SupplierCatalogActivity extends AppCompatActivity
@@ -81,11 +83,24 @@ public class SupplierCatalogActivity extends AppCompatActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        return super.onCreateOptionsMenu(menu);
+        getMenuInflater().inflate(R.menu.menu_supplier_catalog, menu);
+        return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_add_supplier:
+                Intent intentSupplier = new Intent(
+                        SupplierCatalogActivity.this, EditSupplierActivity.class);
+                startActivity(intentSupplier);
+                return true;
+            case R.id.action_delete_all_suppliers:
+                int suppliersDeleted = getContentResolver().delete(
+                        GameStoreContract.SupplierEntry.CONTENT_URI, null, null);
+                Log.v("DeleteAllSuppliers", "Rows Deleted: " + suppliersDeleted);
+                return true;
+        }
         return super.onOptionsItemSelected(item);
     }
 }

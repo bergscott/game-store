@@ -94,7 +94,7 @@ public class ProductCatalogActivity extends AppCompatActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_catalog, menu);
+        getMenuInflater().inflate(R.menu.menu_product_catalog, menu);
         return true;
     }
 
@@ -102,22 +102,19 @@ public class ProductCatalogActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_add_prodcut:
-                Intent intentProduct = new Intent(ProductCatalogActivity.this, EditProductActivity.class);
+                Intent intentProduct = new Intent(
+                        ProductCatalogActivity.this, EditProductActivity.class);
                 startActivity(intentProduct);
                 return true;
-            case R.id.action_add_supplier:
-                Intent intentSupplier = new Intent(ProductCatalogActivity.this, EditSupplierActivity.class);
-                startActivity(intentSupplier);
+            case R.id.action_view_suppliers:
+                Intent suppliersIntent = new Intent(
+                        ProductCatalogActivity.this, SupplierCatalogActivity.class);
+                startActivity(suppliersIntent);
                 return true;
             case R.id.action_delete_all_products:
                 int productsDeleted = getContentResolver().delete(
                         ProductEntry.CONTENT_URI, null, null);
                 Log.v("DeleteAllProducts", "Rows Deleted: " + productsDeleted);
-                return true;
-            case R.id.action_delete_all_suppliers:
-                int suppliersDeleted = getContentResolver().delete(
-                        GameStoreContract.SupplierEntry.CONTENT_URI, null, null);
-                Log.v("DeleteAllSuppliers", "Rows Deleted: " + suppliersDeleted);
                 return true;
         }
         return super.onOptionsItemSelected(item);
