@@ -15,8 +15,6 @@ import android.widget.Toast;
 
 import com.bergscott.android.gamestore.data.GameStoreContract;
 
-import java.math.BigDecimal;
-
 /**
  * Created by bergs on 2/15/2017.
  */
@@ -29,7 +27,7 @@ public class ProductCursorAdapter extends CursorAdapter {
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        return LayoutInflater.from(context).inflate(R.layout.list_item_game, parent, false);
+        return LayoutInflater.from(context).inflate(R.layout.list_item_product, parent, false);
     }
 
     @Override
