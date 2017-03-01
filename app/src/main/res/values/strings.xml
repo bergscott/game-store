@@ -4,4 +4,9 @@
     <string name="list_item_quantity">Quantity: <xliff:g example="12" id="quantity">%d</xliff:g></string>
 
     <string name="list_item_price">$<xliff:g example="19.99" id="formatted_price">%.2f</xliff:g></string>
+
+    <string name="list_item_phone">Phone: <xliff:g example="1-920-555-5555" id="phone_number">%s</xliff:g></string>
+
+    <string name="list_item_web">Web: <xliff:g example="http://www.website.com" id="website">%s</xliff:g></string>
+
 </resources>
