@@ -36,12 +36,26 @@ public class SupplierCursorAdapter extends CursorAdapter {
         TextView phoneTextView = (TextView) view.findViewById(R.id.list_item_supplier_phone_text_view);
         String phoneNumber =
                 cursor.getString(cursor.getColumnIndex(SupplierEntry.COLUMN_SUPPLIER_PHONE));
+
+        // if the phoneNumber is null, change it to a readable message indicating no number
+        // was entered
+        if (phoneNumber == null) {
+            phoneNumber = context.getString(R.string.list_item_null);
+        }
+
         phoneTextView.setText(context.getString(R.string.list_item_phone, phoneNumber));
 
         // find the text view for the website and set its text with the value in the cursor
         TextView webTextView = (TextView) view.findViewById(R.id.list_item_supplier_web_text_view);
         String website =
                 cursor.getString(cursor.getColumnIndex(SupplierEntry.COLUMN_SUPPLIER_WEB));
+
+        // if the website is null, change it to a readable message indicating no website
+        // was entered
+        if (website == null) {
+            website = context.getString(R.string.list_item_null);
+        }
+
         webTextView.setText(context.getString(R.string.list_item_web, website));
     }
 }

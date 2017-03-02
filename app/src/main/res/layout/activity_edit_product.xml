@@ -64,7 +64,7 @@
                 android:text="USD"
                 android:textSize="12sp" />
         </LinearLayout>
-        
+
     </LinearLayout>
 
     <LinearLayout

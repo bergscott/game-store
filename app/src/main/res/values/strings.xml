@@ -9,4 +9,6 @@
 
     <string name="list_item_web">Web: <xliff:g example="http://www.website.com" id="website">%s</xliff:g></string>
 
+    <string name="list_item_null">Not entered</string>
+
 </resources>
