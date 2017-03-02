@@ -144,7 +144,6 @@ public class EditProductActivity extends AppCompatActivity
 
         switch (loader.getId()) {
             case PRODUCTS_LOADER:
-                Log.v("EditProdcutActivity", "Products Loader Finished");
                 if (cursor.moveToFirst()) {
                     mNameEditText.setText(cursor.getString(
                             cursor.getColumnIndex(ProductEntry.COLUMN_PRODUCT_NAME)));
@@ -160,7 +159,6 @@ public class EditProductActivity extends AppCompatActivity
                 }
                 break;
             case SUPPLIERS_LOADER:
-                Log.v("EditProdcutActivity", "Suppliers Loader Finished");
                 MatrixCursor extras = new MatrixCursor(new String[] {
                         GameStoreContract.SupplierEntry._ID,
                         GameStoreContract.SupplierEntry.COLUMN_SUPPLIER_NAME
@@ -182,14 +180,12 @@ public class EditProductActivity extends AppCompatActivity
     public void onLoaderReset(Loader<Cursor> loader) {
         switch (loader.getId()) {
             case PRODUCTS_LOADER:
-                Log.v("EditProdcutActivity", "Products Loader Reset");
                 mNameEditText.getText().clear();
                 mPriceEditText.getText().clear();
                 mQuantityEditText.getText().clear();
                 mSupplierSpinner.setSelection(SPINNER_SUPPLIER_NONE);
                 break;
             case SUPPLIERS_LOADER:
-                Log.v("EditProdcutActivity", "Suppliers Loader Reset");
                 mSupplierSpinner.setAdapter(null);
                 break;
             default: // Do nothing
@@ -209,7 +205,6 @@ public class EditProductActivity extends AppCompatActivity
             // if the id of the row in the cursor matches the supplier id we're looking for, return
             // the current position
             if (cursor.getLong(cursor.getColumnIndex(GameStoreContract.SupplierEntry._ID)) == id) {
-                Log.v("EditProductActivity", "Supplier_ID: " + id + " Position: " + cursor.getPosition());
                 return cursor.getPosition();
             }
         }
