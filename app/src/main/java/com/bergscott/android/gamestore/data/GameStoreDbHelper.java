@@ -28,7 +28,7 @@ public class GameStoreDbHelper extends SQLiteOpenHelper {
                 "CREATE TABLE " + SupplierEntry.TABLE_NAME + " ("
                 + SupplierEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + SupplierEntry.COLUMN_SUPPLIER_NAME + " TEXT NOT NULL, "
-                + SupplierEntry.COLUMN_SUPPLIER_PHONE + " INTEGER, "
+                + SupplierEntry.COLUMN_SUPPLIER_PHONE + " TEXT, "
                 + SupplierEntry.COLUMN_SUPPLIER_WEB + " TEXT);";
 
         // create a String SQL statement to create the products table
