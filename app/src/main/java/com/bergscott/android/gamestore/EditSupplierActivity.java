@@ -1,6 +1,10 @@
 package com.bergscott.android.gamestore;
 
+import android.app.LoaderManager;
 import android.content.ContentValues;
+import android.content.CursorLoader;
+import android.content.Loader;
+import android.database.Cursor;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,7 +16,8 @@ import android.widget.Toast;
 
 import com.bergscott.android.gamestore.data.GameStoreContract.SupplierEntry;
 
-public class EditSupplierActivity extends AppCompatActivity {
+public class EditSupplierActivity extends AppCompatActivity
+        implements LoaderManager.LoaderCallbacks<Cursor> {
 
     /** EditText field for Supplier name */
     private EditText mNameEditText;
@@ -23,6 +28,12 @@ public class EditSupplierActivity extends AppCompatActivity {
     /** EditText field for Supplier website */
     private EditText mWebEditText;
 
+    /** Uri of the supplier being edited. Null if creating a new product */
+    private Uri mSupplierUri;
+
+    /** Id of suppliers loader */
+    private final int SUPPLIERS_LOADER = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,6 +43,24 @@ public class EditSupplierActivity extends AppCompatActivity {
         mNameEditText = (EditText) findViewById(R.id.edit_text_supplier_name);
         mPhoneEditText = (EditText) findViewById(R.id.edit_text_supplier_phone);
         mWebEditText = (EditText) findViewById(R.id.edit_text_supplier_web);
+
+        // Get the current supplier's uri from the intent. If a new supplier is being created, the
+        // uri will be null
+        mSupplierUri = getIntent().getData();
+
+        // set the activity's title based on whether we are creating a supplier or editing an
+        // existing supplier
+        if (mSupplierUri == null) {
+            setTitle("Create Supplier");
+        } else {
+            setTitle("Edit Supplier");
+        }
+
+        // if we are editing an existing supplier, initialize a loader that will fill in the edit
+        // text fields with the pre-existing values
+        if (mSupplierUri != null) {
+            getLoaderManager().initLoader(SUPPLIERS_LOADER, null, this);
+        }
     }
 
     @Override
@@ -64,26 +93,78 @@ public class EditSupplierActivity extends AppCompatActivity {
         }
 
         ContentValues values = new ContentValues();
-        values.put(SupplierEntry.COLUMN_SUPPLIER_NAME, nameString);
+        if (!TextUtils.isEmpty(SupplierEntry.COLUMN_SUPPLIER_NAME)) {
+            values.put(SupplierEntry.COLUMN_SUPPLIER_NAME, nameString);
+        }
+
         if (!TextUtils.isEmpty(phoneString)) {
             values.put(SupplierEntry.COLUMN_SUPPLIER_PHONE, phoneString);
+        } else {
+            values.putNull(SupplierEntry.COLUMN_SUPPLIER_PHONE);
         }
+
         if (!TextUtils.isEmpty(webString)) {
             values.put(SupplierEntry.COLUMN_SUPPLIER_WEB, webString);
+        } else {
+            values.putNull(SupplierEntry.COLUMN_SUPPLIER_WEB);
         }
 
         // insert the supplier into the database
         try {
-            Uri resultUri = getContentResolver().insert(SupplierEntry.CONTENT_URI, values);
+            if (mSupplierUri == null) {
+                // insert the new supplier into the suppliers table
+                Uri resultUri = getContentResolver().insert(SupplierEntry.CONTENT_URI, values);
 
-            // check the resulting URI to see if the insert operatoin was a success and show a Toast
-            if (resultUri == null) {
-                Toast.makeText(this, "Error with saving supplier", Toast.LENGTH_SHORT).show();
+                // check the resulting URI to see if the insert operation was a success and show a Toast
+                if (resultUri == null) {
+                    Toast.makeText(this, "Error with saving supplier", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(this, "Supplier added!", Toast.LENGTH_SHORT).show();
+                }
             } else {
-                Toast.makeText(this, "Supplier added!", Toast.LENGTH_SHORT).show();
+                // updating an existing supplier, so update it
+                int rowsUpdated = getContentResolver().update(mSupplierUri, values, null, null);
+
+                // check to see if the update was a success a show a message to the user
+                if (rowsUpdated == 0) {
+                    Toast.makeText(this, "Error with updating supplier", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(this, "Supplier updated!", Toast.LENGTH_SHORT).show();
+                }
             }
         } catch (IllegalArgumentException e) {
             Toast.makeText(this, "Not saved: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+        String[] projection = {
+                SupplierEntry._ID,
+                SupplierEntry.COLUMN_SUPPLIER_NAME,
+                SupplierEntry.COLUMN_SUPPLIER_PHONE,
+                SupplierEntry.COLUMN_SUPPLIER_WEB
+        };
+        return new CursorLoader(this, mSupplierUri, projection, null, null, null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        if (cursor.moveToFirst()) {
+            mNameEditText.setText(cursor.getString(
+                    cursor.getColumnIndex(SupplierEntry.COLUMN_SUPPLIER_NAME)));
+            String phoneNumber = cursor.getString(
+                    cursor.getColumnIndex(SupplierEntry.COLUMN_SUPPLIER_PHONE));
+            mPhoneEditText.setText(phoneNumber);
+            String website = cursor.getString(cursor.getColumnIndex(SupplierEntry.COLUMN_SUPPLIER_WEB));
+            mWebEditText.setText(website);
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mNameEditText.getText().clear();
+        mPhoneEditText.getText().clear();
+        mWebEditText.getText().clear();
     }
 }
