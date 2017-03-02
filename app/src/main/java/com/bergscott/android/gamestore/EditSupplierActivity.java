@@ -70,10 +70,25 @@ public class EditSupplierActivity extends AppCompatActivity
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+
+        // if we are creating a new supplier, hide the delete option
+        if (mSupplierUri == null) {
+            menu.findItem(R.id.action_delete_entry).setVisible(false);
+        }
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_save_entry:
                 saveSupplier();
+                finish();
+                return true;
+            case R.id.action_delete_entry:
+                deleteSupplier();
                 finish();
                 return true;
         }
@@ -134,6 +149,21 @@ public class EditSupplierActivity extends AppCompatActivity
             }
         } catch (IllegalArgumentException e) {
             Toast.makeText(this, "Not saved: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void deleteSupplier() {
+        // return early if we are creating a new supplier
+        if (mSupplierUri == null) { return; }
+
+        // delete the supplier that is currently being edited
+        int rowsDeleted = getContentResolver().delete(mSupplierUri, null, null);
+
+        // show a Toast message to the user indicated if deletion was successful
+        if (rowsDeleted == 0) {
+            Toast.makeText(this, "No Supplier Deleted", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "Supplier Deleted", Toast.LENGTH_SHORT).show();
         }
     }
 
