@@ -3,10 +3,12 @@ package com.bergscott.android.gamestore;
 import android.app.LoaderManager;
 import android.content.ContentUris;
 import android.content.CursorLoader;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.bergscott.android.gamestore.data.GameStoreContract;
 import com.bergscott.android.gamestore.data.GameStoreContract.SupplierEntry;
@@ -96,11 +99,44 @@ public class SupplierCatalogActivity extends AppCompatActivity
                 startActivity(intentSupplier);
                 return true;
             case R.id.action_delete_all_suppliers:
-                int suppliersDeleted = getContentResolver().delete(
-                        GameStoreContract.SupplierEntry.CONTENT_URI, null, null);
-                Log.v("DeleteAllSuppliers", "Rows Deleted: " + suppliersDeleted);
+                showDeleteConfirmationDialog();
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showDeleteConfirmationDialog() {
+        // Create an AlertDialog.Builder and set the message, and click listeners
+        // for the positive and negative buttons on the dialog.
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.delete_all_suppliers_dialog_msg);
+        builder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User clicked the "Delete" button, so delete the product.
+                deleteAllSuppliers();
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User clicked the "Cancel" button, so dismiss the dialog
+                // and continue editing the pet.
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+            }
+        });
+
+        // Create and show the AlertDialog
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    private void deleteAllSuppliers() {
+        int suppliersDeleted = getContentResolver().delete(SupplierEntry.CONTENT_URI, null, null);
+        if (suppliersDeleted == 0) {
+            Toast.makeText(this, "No suppliers deleted", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, suppliersDeleted + " suppliers deleted", Toast.LENGTH_SHORT).show();
+        }
     }
 }

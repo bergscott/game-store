@@ -12,6 +12,7 @@
     <string name="list_item_null">Not entered</string>
 
     <string name="delete_all_dialog_msg">Really delete ALL products?</string>
+    <string name="delete_all_suppliers_dialog_msg">Really delete ALL suppliers?</string>
     <string name="delete">Delete</string>
     <string name="cancel">Cancel</string>
 
