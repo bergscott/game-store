@@ -16,4 +16,13 @@
     <string name="delete">Delete</string>
     <string name="cancel">Cancel</string>
 
+    <!-- Text for unsaved changes dialog box -->
+    <string name="unsaved_changes_dialog_msg">Discard your changes and quit editing?</string>
+
+    <!-- Positive option for unsaved changes dialog box -->
+    <string name="discard">Discard</string>
+
+    <!-- Negative option for unsaved changes dialog box -->
+    <string name="keep_editing">Keep Editing</string>
+
 </resources>
