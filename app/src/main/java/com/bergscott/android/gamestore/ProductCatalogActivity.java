@@ -3,10 +3,12 @@ package com.bergscott.android.gamestore;
 import android.app.LoaderManager;
 import android.content.ContentUris;
 import android.content.CursorLoader;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.bergscott.android.gamestore.data.GameStoreContract;
 import com.bergscott.android.gamestore.data.GameStoreContract.ProductEntry;
@@ -112,11 +115,44 @@ public class ProductCatalogActivity extends AppCompatActivity
                 startActivity(suppliersIntent);
                 return true;
             case R.id.action_delete_all_products:
-                int productsDeleted = getContentResolver().delete(
-                        ProductEntry.CONTENT_URI, null, null);
-                Log.v("DeleteAllProducts", "Rows Deleted: " + productsDeleted);
+                showDeleteConfirmationDialog();
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showDeleteConfirmationDialog() {
+        // Create an AlertDialog.Builder and set the message, and click listeners
+        // for the postivie and negative buttons on the dialog.
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.delete_all_dialog_msg);
+        builder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User clicked the "Delete" button, so delete the product.
+                deleteAllProducts();
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User clicked the "Cancel" button, so dismiss the dialog
+                // and continue editing the pet.
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+            }
+        });
+
+        // Create and show the AlertDialog
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    private void deleteAllProducts() {
+        int productsDeleted = getContentResolver().delete(ProductEntry.CONTENT_URI, null, null);
+        if (productsDeleted == 0) {
+            Toast.makeText(this, "No products deleted", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, productsDeleted + " products deleted!", Toast.LENGTH_SHORT).show();
+        }
     }
 }
